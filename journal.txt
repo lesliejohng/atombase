@@ -1,0 +1,14 @@
+30 Jan 2021
+
+I will write a chess program based on python chess which encapsulates my ideas
+about chess. This is for the challenge of clear thinking and I have no initial
+plans to make this a commercial success or even to make it useful for others.
+
+My approach will be based on a well-respected thinking method based on a the
+approach used by Karpov. I am using this because it makes sense to me and
+the system is described well in the book 'finding the right plan'.
+
+Python chess has a number of features which I will use to create the required
+program. I will need to learn python on the fly, so don't look to the code as
+an example. I confident that I can get some of my ideas working, but don't
+expect my approach to be "pythonic"!
