@@ -46,3 +46,22 @@ These have not been fully clarified in my mind, but my main ideas are:-
 
 3 The positions will display with some type of prompt showing the elements
   in a verbal form.
+
+  Taking these one at a time
+
+  1 Position clarification
+
+    a need to identify validity of the position
+
+    b need to identify if our king is in check
+
+    c need to identify pinned pieces
+
+    d  need to identify the forcing moves in a position i.e.
+      i   checks
+      ii  captures
+      iii attacks on a Queen
+      iv  attacks on an unprotected piece
+      v   pins
+      vi  pawn promotion
+      vii attacks on a higher value piece
