@@ -11,4 +11,8 @@ others as:-
    2 I am a 'poor to average' chess player so my ideas about
      chess should definitely be laughed at! (As my results attest)
 
+This program is written in Python 3 and uses the excellent python
+chess library. To run the program you need to install this Python
+package.     
+
 I can be contacted on lesliejohng@gmail.com

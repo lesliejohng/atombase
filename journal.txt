@@ -12,3 +12,8 @@ Python chess has a number of features which I will use to create the required
 program. I will need to learn python on the fly, so don't look to the code as
 an example. I confident that I can get some of my ideas working, but don't
 expect my approach to be "pythonic"!
+
+02/01/21
+I added a README file and a LICENCE file, basing the licence on the MIT open
+licence. Added an 'import' file to import the chess module from Python Chess.
+Tested and committed changes.
