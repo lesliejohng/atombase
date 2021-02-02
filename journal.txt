@@ -65,3 +65,24 @@ These have not been fully clarified in my mind, but my main ideas are:-
       v   pins
       vi  pawn promotion
       vii attacks on a higher value piece
+
+Starting with 1a I undertook a simple test on the python Chess
+library. In a Jupyter Notebook I removed the black king from the
+starting position and generated a board. This was accepted by the
+library without complaint. I will need, therefore, to develop my own
+routine to check the validity of the position.
+
+The analysis of board validity will always be taken from the viewpoint
+of the colour which is to play. This perspective will be called 'the
+player'. The other side will be identified as 'the opponent'.
+
+The analysis will always be made with The Player to move.
+
+The validity tests I will use are:-
+  Are there exactly two kings on the board?
+  Is the opponent in check?
+    If so then the position is invalid. The opponent has not played
+    a move to get himself out of check or has played a move which has
+    put himself in check.
+  Are there less than 9 White Pawns and 9 Black Pawns on the board?
+  Are there any Pawns on the 1st or 8th Rank of the Board?
