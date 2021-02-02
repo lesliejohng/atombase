@@ -17,3 +17,32 @@ expect my approach to be "pythonic"!
 I added a README file and a LICENCE file, basing the licence on the MIT open
 licence. Added an 'import' file to import the chess module from Python Chess.
 Tested and committed changes.
+
+review- the use of a import file is probably unnecessary and confusing better
+to import where needed in individual files. There appears to be no problem
+in Python over duplicate imports.
+
+In establishing a chess program I wish to use my own ideas. I have read up on
+the approaches used by others, but feel you can only do something valuable if
+you do it differently.
+
+So: What is my aim and what will be my approach?
+
+My aim...
+
+There are many 'playing' programs, so this will not be one more.. Instead I
+want a program which will take a position and identify to important features
+of that position. The aim is to guide a human player.
+
+My approach...
+
+These have not been fully clarified in my mind, but my main ideas are:-
+
+1 That in order to identify the elements in a position that position must be
+  'settled'. My initial idea is to explore a position initially and produce
+  an array of the likely derived positions and to analyse each of these.
+
+2 The position analysis will be based on the Karpov approach
+
+3 The positions will display with some type of prompt showing the elements
+  in a verbal form.
