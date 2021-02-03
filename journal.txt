@@ -85,4 +85,10 @@ The validity tests I will use are:-
     a move to get himself out of check or has played a move which has
     put himself in check.
   Are there less than 9 White Pawns and 9 Black Pawns on the board?
+  Are there less than 17 White Pieces and 17 Black Pieces on the Board?
+  Is the total of pawns and queens for each side less that 10?
+  Does each side have a maximum of one white-squared and black-squared
+    Bishop?
+      This might be possible if one of the sides under-promoted to
+      a Bishop, but this is unlikely.
   Are there any Pawns on the 1st or 8th Rank of the Board?
