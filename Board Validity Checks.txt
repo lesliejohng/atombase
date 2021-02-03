@@ -12,3 +12,27 @@ The validity tests I will use are:-
       This might be possible if one of the sides under-promoted to
       a Bishop, but this is unlikely.
   Are there any Pawns on the 1st or 8th Rank of the Board?
+
+I will use the fen to undertake this check and will additionally
+undertake the following checks
+
+  that all characters in the board string are valid ENGLISH piece
+  representations (i.e. kqrbnpKQRBNP) numbers are ignored in this
+  check
+
+  that exactly of 64 positions have been defined in the board element
+    of the fen string
+
+  that where there are 8 ranks defined
+    1 each board rank (between the '/' symbols) adds up to 8 squares
+    2 that numbers in the board element of fen range 1 to 8
+
+  that ep indicators are consistent with pawn positions
+
+  that castling rights are consistent with King and Rook positions
+
+  that the half-move clock are consistent with move number
+
+  NB
+  *Python chess has strong move validation, so this check only has to
+  be performed on the initial position*
