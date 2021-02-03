@@ -79,7 +79,7 @@ player'. The other side will be identified as 'the opponent'.
 The analysis will always be made with The Player to move.
 
 The validity tests I will use are:-
-  Are there exactly two kings on the board?
+  Are there exactly one king for each side on the board?
   Is the opponent in check?
     If so then the position is invalid. The opponent has not played
     a move to get himself out of check or has played a move which has
