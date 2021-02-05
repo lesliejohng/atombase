@@ -6,100 +6,98 @@
 # if possible the class will correct any errors in the initial fen
 # before outputting a valid string
 
-def dline():
-    print('*' * 60)
+class Warning():
+    def __init__(self,
+                    header = "Warning",
+                    body = "Add your warning here",
+                    instruction = "",
+                    asterixNo = 60):
+        self.header = header
+        self.body = body
+        self.instruction = instruction
+        self.asterixNo = asterixNo
+        self.printMessage()
+
+    def dline(self):
+        print('*' * self.asterixNo)
+
+    def printMessage(self):
+        self.dline()
+        print("\n     "+self.header+"\n")
+        print("\n     "+self.body+"\n")
+        if self.instruction:
+            print("\n     "+self.instruction+"\n")
+        self.dline()
+
 
 class Fen():
-  def __init__(self, fen):
-      self.fen = fen
-      self.fenElements = fen.split(' ')
-      self.fenBoard = self.fenElements[0]
-      if len(self.fenElements) == 6:
-         self.fenToPlay = self.fenElements[1]
-         self.fenCastling = self.fenElements[2]
-         self.fenEP = self.fenElements[3]
-         self.fenHalfMoveClock = self.fenElements[4]
-         self.fenMoveCounter = self.fenElements[5]
+    def __init__(self, fen):
+        self.fen = fen
+        self.fenElements = fen.split(' ')
+        self.fenBoard = self.fenElements[0]
+        if len(self.fenElements) == 6:
+            self.fenToPlay = self.fenElements[1]
+            self.fenCastling = self.fenElements[2]
+            self.fenEP = self.fenElements[3]
+            self.fenHalfMoveClock = self.fenElements[4]
+            self.fenMoveCounter = self.fenElements[5]
 
-         self.testBoard()
+            self.testBoard()
 
-      else:
-          dline()
-          print("""
+        else:
+            self.message = Warning(header = 'Fen Error',
+                body = 'incomplete fen string',
+                instruction = 'please check fen has all the required elements')
+            self.message
 
-          incomplete fen string
-          string does not contain all
-          the expected information
-
-          Please recheck: you will be asked
-          for more information
-
-          """)
-          dline()
-
-          self.fenToPlay = 'unknown'
-          self.fenCastling = 'unknown'
-          self.fenEP = 'unknown'
-          self.fenHalfMoveClock = 'unknown'
-          self.fenMoveCounter = 'unknown'
+            self.fenToPlay = 'unknown'
+            self.fenCastling = 'unknown'
+            self.fenEP = 'unknown'
+            self.fenHalfMoveClock = 'unknown'
+            self.fenMoveCounter = 'unknown'
 
 
-  def __repr__(self):
-    return self.fen
+    def __repr__(self):
+         return self.fen
 
-  def testBoard(self):
+    def testBoard(self):
     # this is a series of tests on the board to see if it valid
 
     # test that there are two kings on the fenBoard
     # one White and one Black
-    self.whiteKing = self.fenBoard.count('K')
-    self.blackKing = self.fenBoard.count('k')
-    if self.whiteKing == 0:
-        dline()
-        print("""
+        self.whiteKing = self.fenBoard.count('K')
+        self.blackKing = self.fenBoard.count('k')
 
-        There is no White King on
-        the board
+        if self.whiteKing == 0:
+            self.message = Warning(header = 'Illegal Position',
+                body = 'There is no White King on the board')
+            self.message
 
-        """)
-        dline()
-    if self.whiteKing > 1:
-        dline()
-        print("""
+        if self.whiteKing > 1:
+            self.message = Warning(header = 'Illegal Position',
+                body = 'There are too many White Kings on the Board')
+            self.message
 
-        There are too many
-        White kings on the board
+        if self.blackKing == 0:
+            self.message = Warning(header = 'Illegal Position',
+                body = 'There is no Black King on the board')
+            self.message
 
-        """
-        )
-        dline()
-    if self.blackKing == 0:
-        dline()
-        print("""
-
-        There is no Black King on
-        the board
-
-        """
-        )
-        dline()
-    if self.blackKing > 1:
-        dline()
-        print("""
-
-        There are too many
-        Black kings on the board
-
-            """
-        )
-        dline()
+        if self.blackKing > 1:
+            self.message = Warning(header = 'Illegal Position',
+                body = 'There are too many Black Kings on the board')
+            self.message
 
 
 
 
 
 
-
+test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2')
+test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKK1R b KQkq - 1 2')
+test = Fen('rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+test = Fen('rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
 test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
 
 print(test)
