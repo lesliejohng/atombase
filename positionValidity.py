@@ -35,6 +35,7 @@ class Fen():
         self.fen = fen
         self.fenElements = fen.split(' ')
         self.fenBoard = self.fenElements[0]
+        self.errorLog = []
         if len(self.fenElements) == 6:
             self.fenToPlay = self.fenElements[1]
             self.fenCastling = self.fenElements[2]
@@ -48,6 +49,7 @@ class Fen():
             self.message = Warning(header = 'Fen Error',
                 body = 'incomplete fen string',
                 instruction = 'please check fen has all the required elements')
+            self.errorLog.append('fenError')
             self.message
 
             self.fenToPlay = 'unknown'
@@ -71,21 +73,25 @@ class Fen():
         if self.whiteKing == 0:
             self.message = Warning(header = 'Illegal Position',
                 body = 'There is no White King on the board')
+            self.errorLog.append('noWhiteKing')
             self.message
 
         if self.whiteKing > 1:
             self.message = Warning(header = 'Illegal Position',
                 body = 'There are too many White Kings on the Board')
+            self.errorLog.append('manyWhiteKings')
             self.message
 
         if self.blackKing == 0:
             self.message = Warning(header = 'Illegal Position',
                 body = 'There is no Black King on the board')
+            self.errorLog.append('noBlackKing')
             self.message
 
         if self.blackKing > 1:
             self.message = Warning(header = 'Illegal Position',
                 body = 'There are too many Black Kings on the board')
+            self.errorLog.append('manyBlackKings')
             self.message
 
 
@@ -94,11 +100,23 @@ class Fen():
 
 
 test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2')
+print('error log = ')
+print(test.errorLog)
 test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+print('error log = ')
+print(test.errorLog)
 test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKK1R b KQkq - 1 2')
+print('error log = ')
+print(test.errorLog)
 test = Fen('rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+print('error log = ')
+print(test.errorLog)
 test = Fen('rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+print('error log = ')
+print(test.errorLog)
 test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+print('error log = ')
+print(test.errorLog)
 
 print(test)
 print(test.fenElements)

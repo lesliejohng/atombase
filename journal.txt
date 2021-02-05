@@ -93,15 +93,19 @@ The validity tests I will use are:-
       a Bishop, but this is unlikely.
   Are there any Pawns on the 1st or 8th Rank of the Board?
 
-  3/2/21
-  Added file to check for position validity from a fen string.
+4/2/21
+Added file to check for position validity from a fen string.
 
-  Began to add checks on validity:
+Began to add checks on validity:
   1 fen includes the correct number of parts
   2 that board has one White and one Black kings
 
-  at this stage the identification of an error results in a text
-  message
+at this stage the identification of an error results in a text
+message
+
+5/2/21
+Added errorLog to positionValidity.py for testing purposes
+
 
 
 
