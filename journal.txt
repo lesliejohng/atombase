@@ -106,6 +106,27 @@ message
 5/2/21
 Added errorLog to positionValidity.py for testing purposes
 
+7/2/21
+I want to give the user the opportunity to correct the fen.
+
+The board string has not, yet, been fully checked so initially
+I need to check the other elements to see if any of them are
+acceptable. There will be need to be checks later to see if they
+accord to the fan rules. Maybe I can use these to search the
+elements of the fen string to see if any appear correct.
+
+Whilst this approach may necessitate a re-write to confirm each
+element in turn I will initially concentrate on the testing.
+
+fenToPlay must be a single character, either w or b although I
+will also accept the capitalised. (Need to check what is correct
+in the fen specs and adjust the element accordingly)
+
+9/2/21
+
+added pytest checks for positionValidity
+
+
 
 
 

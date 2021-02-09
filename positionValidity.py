@@ -6,7 +6,7 @@
 # if possible the class will correct any errors in the initial fen
 # before outputting a valid string
 
-class Warning():
+class WarningMsg():
     def __init__(self,
                     header = "Warning",
                     body = "Add your warning here",
@@ -46,7 +46,7 @@ class Fen():
             self.testBoard()
 
         else:
-            self.message = Warning(header = 'Fen Error',
+            self.message = WarningMsg(header = 'Fen Error',
                 body = 'incomplete fen string',
                 instruction = 'please check fen has all the required elements')
             self.errorLog.append('fenError')
@@ -71,62 +71,28 @@ class Fen():
         self.blackKing = self.fenBoard.count('k')
 
         if self.whiteKing == 0:
-            self.message = Warning(header = 'Illegal Position',
+            self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no White King on the board')
             self.errorLog.append('noWhiteKing')
             self.message
 
         if self.whiteKing > 1:
-            self.message = Warning(header = 'Illegal Position',
+            self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many White Kings on the Board')
             self.errorLog.append('manyWhiteKings')
             self.message
 
         if self.blackKing == 0:
-            self.message = Warning(header = 'Illegal Position',
+            self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no Black King on the board')
             self.errorLog.append('noBlackKing')
             self.message
 
         if self.blackKing > 1:
-            self.message = Warning(header = 'Illegal Position',
+            self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many Black Kings on the board')
             self.errorLog.append('manyBlackKings')
             self.message
-
-
-
-
-
-
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2')
-print('error log = ')
-print(test.errorLog)
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
-print('error log = ')
-print(test.errorLog)
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKK1R b KQkq - 1 2')
-print('error log = ')
-print(test.errorLog)
-test = Fen('rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-print('error log = ')
-print(test.errorLog)
-test = Fen('rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-print('error log = ')
-print(test.errorLog)
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-print('error log = ')
-print(test.errorLog)
-
-print(test)
-print(test.fenElements)
-print(test.fenBoard)
-print(test.fenToPlay)
-print(test.fenCastling)
-print(test.fenEP)
-print(test.fenHalfMoveClock)
-print(test.fenMoveCounter)
-
 
 
 
