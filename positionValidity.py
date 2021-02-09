@@ -36,30 +36,32 @@ class Fen():
         self.fenElements = fen.split(' ')
         self.fenBoard = self.fenElements[0]
         self.errorLog = []
+
         if len(self.fenElements) == 6:
-            self.fenToPlay = self.fenElements[1]
+            if self.testToPlay(self.fenElements[1]):
+                self.fenToPlay = self.fenElements[1]
+            else:
+                self.fenToPlay = 'unknown'
             self.fenCastling = self.fenElements[2]
             self.fenEP = self.fenElements[3]
             self.fenHalfMoveClock = self.fenElements[4]
             self.fenMoveCounter = self.fenElements[5]
-
-            self.testBoard()
-
         else:
+            self.fenToPlay = 'unknown'
+            self.fenCastling = 'unknown'
+            self.fenEP = 'unkown'
+            self.fenHalfMoveClock = 'unknown'
+            self.fenMoveCounter = 'unknown'
+
             self.message = WarningMsg(header = 'Fen Error',
                 body = 'incomplete fen string',
                 instruction = 'please check fen has all the required elements')
             self.errorLog.append('fenError')
             self.message
 
-            self.fenToPlay = 'unknown'
-            self.fenCastling = 'unknown'
-            self.fenEP = 'unknown'
-            self.fenHalfMoveClock = 'unknown'
-            self.fenMoveCounter = 'unknown'
+        self.testBoard()
 
-
-    def __repr__(self):
+        def __repr__(self):
          return self.fen
 
     def testBoard(self):
@@ -94,6 +96,26 @@ class Fen():
             self.errorLog.append('manyBlackKings')
             self.message
 
+    def testToPlay(self,fenToPlay):
+        if len(fenToPlay) == 1:
+            if fenToPlay in 'wbWB':
+                return True
+            else:
+                self.message = WarningMsg(header = 'Insufficient Information',
+                    body = 'Not clear whether it is White or Black to play')
+                self.errorLog.append('fenToPlayError')
+                self.message
+                return False
+        else:
+            self.message = WarningMsg(header = '"To Play" element of fen',
+                    body = 'This element is too long')
+            self.errorLog.append('fenToPlayLength')
+            self.message
+            return False
+
+#initisl test
+#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R wb KQkq - 1 2')
+#print(test.fenToPlay)
 
 
 

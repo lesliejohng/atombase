@@ -26,6 +26,14 @@ def test_manyBlackKings():
     test = Fen('rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
     assert test.errorLog == ['manyBlackKings']
 
+def test_toPlayError():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R z KQkq - 1 2')
+    assert test.errorLog == ['fenToPlayError']
+
+def test_toPlayLength():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R bb KQkq - 1 2')
+    assert test.errorLog == ['fenToPlayLength']
+
 def test_noError():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
     assert test.errorLog == []
