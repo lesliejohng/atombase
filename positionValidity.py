@@ -39,6 +39,9 @@ class Fen():
         self.validCastling =['-','q','kq','Q','Qq','Qk','Qkq','K',
                     'Kq','Kkq','Kq','Kk','Kkq','KQ','KQq','KQk',
                     'KQkq']
+        self.validEPwtp = ['a6','b6','c6','d6','e6','f6','g6','h6']
+        self.validEPbtp = ['a3','b3','c3','d3','e3','f3','g3','h3']
+        self.validEPsquares = self.validEPwtp + self.validEPbtp
 
         if len(self.fenElements) == 6:
             if self.testToPlay(self.fenElements[1]):
@@ -51,7 +54,11 @@ class Fen():
             else:
                 self.fenCastling = 'unknown'
 
-            self.fenEP = self.fenElements[3]
+            if self.testEP(self.fenElements[3]):
+                self.fenEP = self.fenElements[3]
+            else:
+                self.fenEP = 'unkonwn'
+
             self.fenHalfMoveClock = self.fenElements[4]
             self.fenMoveCounter = self.fenElements[5]
         else:
@@ -140,9 +147,58 @@ class Fen():
             self.message
             return False
 
+    def testEP(self,fenEP):
+        if fenEP == '-' or len(fenEP) == 2:
+
+            if fenEP == '-':
+                return True
+            else:
+                if fenEP in self.validEPsquares:
+                    if self.fenToPlay == 'w':
+                        if fenEP in self.validEPwtp:
+                            return True
+                        else:
+                            self.message = WarningMsg(header = 'EP square' + fenEP,
+                                body = 'The EP square is not valid in a "white to play" position')
+                            self.errorLog.append('fenEPSquareInvalid')
+                            self.message
+                            return False
+
+                    if self.fenToPlay == 'b':
+                        if fenEP in self.validEPbtp:
+                            return True
+                        else:
+                            self.message = WarningMsg(header = 'EP square' + fenEP,
+                                body = 'The EP square is not valid in a "black to play" position')
+                            self.errorLog.append('fenEPSquareInvalid')
+                            self.message
+                            return False
+                else:
+                    self.message = WarningMsg(header = 'EP '+ fenEP,
+                        body = 'The EP Element is not a valid square')
+                    self.errorLog.append('fenEPSquareInvalid')
+                    self.message
+                    return False
+
+                if self.fenToPlay == 'unknown':
+                    self.message = WarningMsg(header = 'EP square ' + fenEP,
+                        body = 'It is not known who it is to play',
+                        instruction = 'It is not possible to check the validity of the EP square')
+                    self.errorLog.append('fenEPSquareUnclear')
+                    self.message
+                    return False
+
+        else:
+            self.message = WarningMsg(header = '"EP" element of fen',
+                body = 'This element is too long')
+            self.errorLog.append('fenEPLength')
+            self.message
+            return False
+
+
 #initial test
-#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-#print(test.errorLog)
+test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
+print(test.errorLog)
 
 
 

@@ -126,7 +126,11 @@ in the fen specs and adjust the element accordingly)
 
 added pytest checks for positionValidity
 
+added fen validity check for castling
 
+10/2/21
+
+added test validity of EP
 
 
 

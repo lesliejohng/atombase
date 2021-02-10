@@ -46,6 +46,39 @@ def test_CastlingLength():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkqx - 1 2')
     assert test.errorLog == ['fenCastlingLength']
 
+def test_EPLength():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq ee6 1 2')
+    assert test.errorLog == ['fenEPLength']
+
+def test_EPNone():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    assert test.errorLog == []
+
+def test_EPUnknown():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R - KQkq e6 1 2')
+    assert test.errorLog == ['fenToPlayError', 'fenEPSquareUnclear']
+
+def test_EPInvalidSquare():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e5 1 2')
+    assert test.errorLog == ['fenEPSquareInvalid']
+
+def test_EPwtpValid():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
+    assert test.errorLog == []
+
+def test_EPbtpValid():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e3 1 2')
+    assert test.errorLog == []
+
+def test_EPwtpInvalid():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+    assert test.errorLog == ['fenEPSquareInvalid']
+
+def test_EPbtpValid():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2')
+    assert test.errorLog == ['fenEPSquareInvalid']
+
+
 def test_noError():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
     assert test.errorLog == []
