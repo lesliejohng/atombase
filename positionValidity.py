@@ -59,14 +59,28 @@ class Fen():
             else:
                 self.fenEP = 'unkonwn'
 
-            self.fenHalfMoveClock = self.fenElements[4]
-            self.fenMoveCounter = self.fenElements[5]
+            if is_int(self.fenElements[4]):
+                self.fenHalfMoveClock = self.fenElements[4]
+            else:
+                # as uncritical reset to 0
+                self.fenHalfMoveClock = '0'
+
+            if is_int(self.fenElements[5]):
+                self.fenMoveCounter = self.fenElements[5]
+            else:
+                # as uncritical reset to 1
+                self.fenMoveCounter = '1'
         else:
+            # critical information
             self.fenToPlay = 'unknown'
+            # critical information
             self.fenCastling = 'unknown'
-            self.fenEP = 'unkown'
-            self.fenHalfMoveClock = 'unknown'
-            self.fenMoveCounter = 'unknown'
+            # critical information
+            self.fenEP = 'unknown'
+            # non-critical reset to 0
+            self.fenHalfMoveClock = '0'
+            # non-critical reset to 1
+            self.fenMoveCounter = '1'
 
             self.message = WarningMsg(header = 'Fen Error',
                 body = 'incomplete fen string',
