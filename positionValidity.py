@@ -59,13 +59,13 @@ class Fen():
             else:
                 self.fenEP = 'unkonwn'
 
-            if is_int(self.fenElements[4]):
+            if self.fenElements[4].isdigit():
                 self.fenHalfMoveClock = self.fenElements[4]
             else:
                 # as uncritical reset to 0
                 self.fenHalfMoveClock = '0'
 
-            if is_int(self.fenElements[5]):
+            if self.fenElements[5].isdigit():
                 self.fenMoveCounter = self.fenElements[5]
             else:
                 # as uncritical reset to 1
