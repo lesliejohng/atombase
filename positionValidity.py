@@ -36,13 +36,21 @@ class Fen():
         self.fenElements = fen.split(' ')
         self.fenBoard = self.fenElements[0]
         self.errorLog = []
+        self.validCastling =['-','q','kq','Q','Qq','Qk','Qkq','K',
+                    'Kq','Kkq','Kq','Kk','Kkq','KQ','KQq','KQk',
+                    'KQkq']
 
         if len(self.fenElements) == 6:
             if self.testToPlay(self.fenElements[1]):
                 self.fenToPlay = self.fenElements[1]
             else:
                 self.fenToPlay = 'unknown'
-            self.fenCastling = self.fenElements[2]
+
+            if self.testCastling(self.fenElements[2]):
+                self.fenCastling = self.fenElements[2]
+            else:
+                self.fenCastling = 'unknown'
+
             self.fenEP = self.fenElements[3]
             self.fenHalfMoveClock = self.fenElements[4]
             self.fenMoveCounter = self.fenElements[5]
@@ -98,11 +106,12 @@ class Fen():
 
     def testToPlay(self,fenToPlay):
         if len(fenToPlay) == 1:
-            if fenToPlay in 'wbWB':
+            if fenToPlay in 'wb':
                 return True
             else:
                 self.message = WarningMsg(header = 'Insufficient Information',
-                    body = 'Not clear whether it is White or Black to play')
+                    body = 'Not clear whether it is White or Black to play',
+                    instruction = 'format lowercase "w" or "b"')
                 self.errorLog.append('fenToPlayError')
                 self.message
                 return False
@@ -113,9 +122,27 @@ class Fen():
             self.message
             return False
 
-#initisl test
-#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R wb KQkq - 1 2')
-#print(test.fenToPlay)
+    def testCastling(self,fenCastling):
+        if len(fenCastling) < 5:
+            if fenCastling in self.validCastling:
+                return True
+            else:
+                self.message = WarningMsg(header = 'Castling',
+                    body = 'The Castling Element is not in a valid form',
+                    instruction = 'format "-" or up to 4 letters in order KQkq')
+                self.errorLog.append('fenCastlingError')
+                self.message
+                return False
+        else:
+            self.message = WarningMsg(header = '"Castling" element of fen',
+                body = 'This element is too long')
+            self.errorLog.append('fenCastlingLength')
+            self.message
+            return False
+
+#initial test
+#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+#print(test.errorLog)
 
 
 

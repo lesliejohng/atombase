@@ -34,6 +34,18 @@ def test_toPlayLength():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R bb KQkq - 1 2')
     assert test.errorLog == ['fenToPlayLength']
 
+def test_CastlingCharacters():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2')
+    assert test.errorLog == ['fenCastlingError']
+
+def test_CastlingOrder():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQqk - 1 2')
+    assert test.errorLog == ['fenCastlingError']
+
+def test_CastlingLength():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkqx - 1 2')
+    assert test.errorLog == ['fenCastlingLength']
+
 def test_noError():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
     assert test.errorLog == []
