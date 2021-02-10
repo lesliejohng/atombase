@@ -135,6 +135,8 @@ respectively if they are incorrect.
 
 adapted 'unknown' elements in case of inadequate fen.
 
+added tests for half move and move count
+
 
 
 

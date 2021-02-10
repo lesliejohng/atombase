@@ -74,10 +74,25 @@ def test_EPwtpInvalid():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
     assert test.errorLog == ['fenEPSquareInvalid']
 
-def test_EPbtpValid():
+def test_EPbtpInvalid():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2')
     assert test.errorLog == ['fenEPSquareInvalid']
 
+def test_validHalfMove():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 5')
+    assert test.fenHalfMoveClock == 3
+
+def test_invalidHalfMove():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - x 5')
+    assert test.fenHalfMoveClock == 0
+
+def test_validMoveCount():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    assert test.fenMoveCounter == 2
+
+def test_invalidmoveCount():
+    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 x')
+    assert test.fenHalfMoveClock == 1
 
 def test_noError():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
