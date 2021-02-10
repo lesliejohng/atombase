@@ -130,7 +130,10 @@ added fen validity check for castling
 
 10/2/21
 
-added test validity of EP
+added test validity of EP square in fen. Decided to set these to 0 and 1
+respectively if they are incorrect.
+
+adapted 'unknown' elements in case of inadequate fen.
 
 
 
