@@ -137,6 +137,44 @@ adapted 'unknown' elements in case of inadequate fen.
 
 added tests for half move and move count
 
+11/2/21
+
+Decided to re-factor the board checks into a new class for complex board
+checks, importing features from pychess, if necessary. (Initially the import
+would be by construction rather than inheritance) This is because some of
+the problems (such as identifying whether a king is in check) have already
+been solved in pychess.
+
+This approach will need the fen elements to be passed to the new class, so an
+initial check that all 'unknown' items have been corrected. I will also need
+to build in a check that the 'unknown' fen elements are consistent with the
+errorLog. I will also need to be able to reconstruct the fen string from the
+fen elements.
+
+The order of these changes are, therefore,
+  1 compare 'unknown' elements to error log
+  2 process required to clear all 'unknown' elements
+  3 rebuild full fen string (if all unknowns have been solved)
+  4 add board checking class
+
+Non-Board Error Codes List
+  error Codes           unknown
+  fenError              ..one or more of.. fenToPlay, fenError, fenCastling,
+                        fenEP [fenHalfMove and fenMoveCounter are reset to 0
+                        1 respectively if original fen is incorrect]
+  fenToPlayError        fenToPlay
+  fenToPlayLength       fenToPlay
+  fenCastlingError      fenCastling
+  fenCastlingLength     fenCastling
+  fenEPLength           fenEP
+  fenEPSquareInvalid    fenEP
+  fenEPSquareUnclear    fenEP [This is where it is not known which player is
+                        next to play, so the quoted EP square cannot be
+                        confirmed]
+(see ErrorCode.txt for fuller explanation and details of fenBoard errors)
+
+ACTION added test for fenBoard (not 'unknown'), test_fenHalfMoveClock (is a
+digit) and test_fenMoveCounter (is a digit)
 
 
 
