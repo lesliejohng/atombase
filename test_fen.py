@@ -6,6 +6,10 @@ def good_fen():
     # sets up a Fen object with a valid fen
     return Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
 
+@pytest.fixture
+def good_ep_fen():
+    return Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e3 1 2')
+
 def test_insufficient_fen():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2')
     assert test.errorLog == ['fenError']
@@ -175,3 +179,12 @@ def test_fenElements(good_fen):
     assert good_fen.fenEP == '-'
     assert good_fen.fenHalfMoveClock == '1'
     assert good_fen.fenMoveCounter == '2'
+
+def test_fenElements(good_ep_fen):
+    assert len(good_ep_fen.fenElements) == 6
+    assert good_ep_fen.fenBoard ==  'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert good_ep_fen.fenToPlay == 'b'
+    assert good_ep_fen.fenCastling == 'KQkq'
+    assert good_ep_fen.fenEP == 'e3'
+    assert good_ep_fen.fenHalfMoveClock == '1'
+    assert good_ep_fen.fenMoveCounter == '2'

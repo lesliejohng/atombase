@@ -160,7 +160,7 @@ The order of these changes are, therefore,
 Non-Board Error Codes List
   error Codes           unknown
   fenError              ..one or more of.. fenToPlay, fenError, fenCastling,
-                        fenEP [fenHalfMove and fenMoveCounter are reset to 0
+                        fenEP [fenHalfMoveClock and fenMoveCounter are reset to 0
                         1 respectively if original fen is incorrect]
   fenToPlayError        fenToPlay
   fenToPlayLength       fenToPlay
