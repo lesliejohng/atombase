@@ -176,6 +176,7 @@ Non-Board Error Codes List
 ACTION added test for fenBoard (not 'unknown'), test_fenHalfMoveClock (is a
 digit) and test_fenMoveCounter (is a digit)
 
+ACTION add check of error codes against 'unknown items'
 
 
 

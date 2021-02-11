@@ -29,7 +29,6 @@ class WarningMsg():
             print("\n     "+self.instruction+"\n")
         self.dline()
 
-
 class Fen():
     def __init__(self, fen):
         self.fen = fen
@@ -89,6 +88,7 @@ class Fen():
             self.message
 
         self.testBoard()
+        self.fenIncorrectFlagCheck()
 
         def __repr__(self):
          return self.fen
@@ -208,6 +208,31 @@ class Fen():
             self.errorLog.append('fenEPLength')
             self.message
             return False
+
+    def fenIncorrectFlagCheck(self):
+        # check that fenBoard, fenHalfMoveClock, fenMoveCounter
+        # have not been set to 'unknown'
+        if self.fenBoard == 'unknown':
+            self.errorLog.append('incorrectBoardFlag')
+        if not self.fenHalfMoveClock.isdigit():
+            self.errorLog.append('incorrectHalfMoveFlag')
+        if not self.fenMoveCounter.isdigit():
+            self.errorLog.append('incorrectMoveFlag')
+
+    #def fenErrorFlagCheck(self):
+        #if 'fenError' in self.errorLog:
+            #self.unknownCount == 0
+            #if self.fenToPlay == 'unknown':
+                #self.unknownCount += 1
+            #if self.fenCastling == 'unknown':
+                #self.unknownCount += 1
+            #if self.fenEP == 'unknown':
+                #self.unknownCount += 1
+            #if self.unknownCount >= 1:
+                #pass
+        #else:
+            #self.errorLog.remove('fenError')
+
 
 
 # initial test

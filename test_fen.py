@@ -188,3 +188,36 @@ def test_fenElements(good_ep_fen):
     assert good_ep_fen.fenEP == 'e3'
     assert good_ep_fen.fenHalfMoveClock == '1'
     assert good_ep_fen.fenMoveCounter == '2'
+
+def test_incorrectBoardFlag(good_fen):
+    good_fen.fenBoard = 'unknown'
+    good_fen.fenIncorrectFlagCheck()
+    assert good_fen.errorLog ==  ['incorrectBoardFlag']
+    assert good_fen.fenBoard ==  'unknown'
+    assert good_fen.fenToPlay == 'b'
+    assert good_fen.fenCastling == 'KQkq'
+    assert good_fen.fenEP == '-'
+    assert good_fen.fenHalfMoveClock == '1'
+    assert good_fen.fenMoveCounter == '2'
+
+def test_incorrectHalfMoveFlag(good_fen):
+    good_fen.fenHalfMoveClock = 'unknown'
+    good_fen.fenIncorrectFlagCheck()
+    assert good_fen.errorLog ==  ['incorrectHalfMoveFlag']
+    assert good_fen.fenBoard ==  'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert good_fen.fenToPlay == 'b'
+    assert good_fen.fenCastling == 'KQkq'
+    assert good_fen.fenEP == '-'
+    assert good_fen.fenHalfMoveClock == 'unknown'
+    assert good_fen.fenMoveCounter == '2'
+
+def test_incorrectMoveFlag(good_fen):
+    good_fen.fenMoveCounter = 'unknown'
+    good_fen.fenIncorrectFlagCheck()
+    assert good_fen.errorLog ==  ['incorrectMoveFlag']
+    assert good_fen.fenBoard ==  'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert good_fen.fenToPlay == 'b'
+    assert good_fen.fenCastling == 'KQkq'
+    assert good_fen.fenEP == '-'
+    assert good_fen.fenHalfMoveClock == '1'
+    assert good_fen.fenMoveCounter == 'unknown'
