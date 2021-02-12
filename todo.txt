@@ -1,0 +1,16 @@
+Identified changes
+The order of these changes are, therefore,
+  1 compare 'unknown' elements to error log
+  2 process required to clear all 'unknown' elements
+  3 rebuild full fen string (if all unknowns have been solved)
+  4 add board checking class
+
+Current Actions
+
+Continue checks on 'unknown' elements against errorLog entries
+
+***********************************************************************
+
+Other changes
+
+Add recognition of 50 move rule in checking of fenHalfMoveClock

@@ -88,6 +88,7 @@ class Fen():
             self.message
 
         self.testBoard()
+        self.fenErrorFlagCheck()
         self.fenIncorrectFlagCheck()
 
         def __repr__(self):
@@ -219,19 +220,17 @@ class Fen():
         if not self.fenMoveCounter.isdigit():
             self.errorLog.append('incorrectMoveFlag')
 
-    #def fenErrorFlagCheck(self):
-        #if 'fenError' in self.errorLog:
-            #self.unknownCount == 0
-            #if self.fenToPlay == 'unknown':
-                #self.unknownCount += 1
-            #if self.fenCastling == 'unknown':
-                #self.unknownCount += 1
-            #if self.fenEP == 'unknown':
-                #self.unknownCount += 1
-            #if self.unknownCount >= 1:
-                #pass
-        #else:
-            #self.errorLog.remove('fenError')
+    def fenErrorFlagCheck(self):
+        self.unknownCount = 0
+        if 'fenError' in self.errorLog:
+            if self.fenToPlay == 'unknown':
+                self.unknownCount += 1
+            if self.fenCastling == 'unknown':
+                self.unknownCount += 1
+            if self.fenEP == 'unknown':
+                self.unknownCount += 1
+            if self.unknownCount == 0:
+                self.errorLog.remove('fenError')
 
 
 
