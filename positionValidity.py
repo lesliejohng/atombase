@@ -35,13 +35,13 @@ class Fen():
 
         # Variables required for checking fen elements
             # A) castling
+        self.validBoardCharacters = '12345678/kqrnbpKQRBNP'
         self.validCastling =['-','q','kq','Q','Qq','Qk','Qkq','K',
                    'Kq','Kkq','Kq','Kk','Kkq','KQ','KQq','KQk',
                    'KQkq']
             # B) valid EP square
         self.validEPwtp = ['a6','b6','c6','d6','e6','f6','g6','h6']
         self.validEPbtp = ['a3','b3','c3','d3','e3','f3','g3','h3']
-        self.validEPsquares = self.validEPwtp + self.validEPbtp
 
         # required
         self.fenElementDict = {}
@@ -53,21 +53,14 @@ class Fen():
             self.fenElementDict['fenBoard']= self.fenElements[0]
 
             if len(self.fenElements) == 6:
-                if self.identifyToPlay(self.fenElements[1]):
-                    self.fenElementDict['fenToPlay'] = self.fenElements[1]
-
-                if self.identifyCastling(self.fenElements[2]):
-                    self.fenElementDict['fenCastling'] = self.fenElements[2]
-
-                if self.testEP(self.fenElements[3]):
-                    self.fenElementDict['fenEP'] = self.fenElements[3]
-
+                self.fenElementDict['fenToPlay'] = self.identifyToPlay(self.fenElements[1])
+                self.fenElementDict['fenCastling'] = self.identifyCastling(self.fenElements[2])
+                self.fenElementDict['fenEP'] = self.identifyEP(self.fenElements[3])
                 if self.fenElements[4].isdigit():
                     self.fenElementDict['fenHalfMoveClock'] = self.fenElements[4]
                 else:
                     # as uncritical reset to 0
                     self.fenElementDict['fenHalfMoveClock'] = '0'
-
                 if self.fenElements[5].isdigit():
                     self.fenElementDict['fenMoveCounter'] = self.fenElements[5]
                 else:
@@ -93,34 +86,80 @@ class Fen():
         return self.fen
 
     # This section is for routines which identify fenElements
+    # these return a correct value for the respective element
 
     def identifyToPlay(self, fenToPlay):
         # ToPlay consists of a single 'w' or 'b' character
         if fenToPlay == 'w' or fenToPlay == 'b':
-            return True
+            return fenToPlay
         else:
             self.message = WarningMsg(header = 'Error in To Play element of fen',
                     body = str(fenToPlay)+' input is not valid',
                     instruction = 'should be either "w" or "b". Please re-input.')
             self.message
-            self.toPlayInput()
-            return True
+            return self.toPlayInput()
 
     def identifyCastling(self,fenCastling):
         if not 'fenToPlay' in self.fenElementDict.keys():
             self.toPlayInput()
 
         if fenCastling in self.validCastling:
-            return True
+            return fenCastling
         else:
             self.message = WarningMsg(header = 'Castling: '+str(fenCastling),
                     body = 'The Castling Element is not in a valid form',
                     instruction = 'format "-" or up to 4 letters in order KQkq')
             self.message
-            self.castlingInput()
-            return False
+            return self.castlingInput()
+
+    def identifyEP(self,fenEP):
+        if fenEP == '-':
+                return fenEP
+        else:
+            if not 'fenToPlay' in self.fenElementDict:
+                self.fenToPlayInput()
+            if self.fenElementDict.get('fenToPlay') == 'w':
+                return self.identifyEPwtp(fenEP)
+            else:
+                if self.fenElementDict.get('fenToPlay') == 'b':
+                    return self.identifyEPbtp(fenEP)
+                else:
+                    return self.epInput()
+
+
+    def identifyEPwtp(self,fenEP):
+        if self.fenElementDict.get('fenToPlay') == 'w':
+            if fenEP in self.validEPwtp:
+                return fenEP
+        else:
+            self.message = WarningMsg(header = 'EP square: ' + str(fenEP),
+                        body = 'The EP square is not valid in a "white to play" position')
+            self.message
+            return self.epInput()
+
+    def identifyEPbtp(self,fenEP):
+        if fenEP in self.validEPbtp:
+            return fenEP
+        else:
+            self.message = WarningMsg(header = 'EP square' + str(fenEP),
+                    body = 'The EP square is not valid in a "black to play" position')
+            self.message
+            return self.epInput()
 
     # This section is for input routines
+    # these set the respective key in the dictionary directly
+
+    def inputBoard(self):
+        # temporary
+        # set board to starting position
+        self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+
+    def amendBoard(self):
+        # temporary
+        # set board to starting position
+        self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+        # eventually this will display the board and allow user to
+        # amend it
 
     def partFenInput(self):
         # case of incomplete fen
@@ -134,7 +173,7 @@ class Fen():
 
     def fullFenInput(self):
         # temporary
-        # set these values
+        # set these values to starting position
         self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
         self.fenElementDict['fenToPlay'] = 'w'
         self.fenElementDict['fenCastling'] = 'KQkq'
@@ -152,9 +191,23 @@ class Fen():
         # set castling to call
         self.fenElementDict['fenCastling'] = 'KQkq'
 
+    def epInput(self):
+        # temporary
+        # set ep to none
+        self.fenElementDict['fenEP'] = '-'
+
     # This section is for deeper validity checks
+    # these
     def testBoard(self):
         # this is a series of tests on the board to see if it valid
+
+        # test if fenBoard element contains only valid characters
+        for char in self.fenElementDict.get('fenBoard'):
+            if not char in self.validBoardCharacters:
+                self.message = WarningMsg(header = 'Board Error',
+                    body = 'There are invalid characters in fenBoard')
+                self.message
+                self.inputBoard()
 
         # test that there are two kings on the fenBoard
         # one White and one Black
@@ -165,64 +218,30 @@ class Fen():
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no White King on the board')
             self.message
+            self.amendBoard()
 
         if self.whiteKing > 1:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many White Kings on the Board')
             self.message
+            self.amendBoard()
 
         if self.blackKing == 0:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no Black King on the board')
             self.message
+            self.amendBoard()
 
         if self.blackKing > 1:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many Black Kings on the board')
             self.message
+            self.amendBoard()
 
-    def testEP(self,fenEP):
-        if fenEP == '-' or len(fenEP) == 2:
+    def fenReconstruct(self):
+        # this will recompile the elements into a valid fen
+        pass
 
-            if fenEP == '-':
-                return True
-            else:
-                if fenEP in self.validEPsquares:
-                    if self.fenElementDict.get('fenToPlay') == 'w':
-                        if fenEP in self.validEPwtp:
-                            return True
-                        else:
-                            self.message = WarningMsg(header = 'EP square: ' + str(fenEP),
-                                body = 'The EP square is not valid in a "white to play" position')
-                            self.message
-                            return False
-
-                    if self.fenElementDict.get('fenToPlay') == 'b':
-                        if fenEP in self.validEPbtp:
-                            return True
-                        else:
-                            self.message = WarningMsg(header = 'EP square' + str(fenEP),
-                                body = 'The EP square is not valid in a "black to play" position')
-                            self.message
-                            return False
-                else:
-                    self.message = WarningMsg(header = 'EP '+ str(fenEP),
-                        body = 'The EP Element is not a valid square')
-                    self.message
-                    return False
-
-                if self.fenElementDict.get('fenToPlay' ,'unknown') == 'unknown':
-                    self.message = WarningMsg(header = 'EP square ' + str(fenEP),
-                        body = 'It is not known who it is to play',
-                        instruction = 'It is not possible to check the validity of the EP square')
-                    self.message
-                    return False
-
-        else:
-            self.message = WarningMsg(header = '"EP" element of fen',
-                body = 'This element is too long')
-            self.message
-            return False
 
 # initial test
 # test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
