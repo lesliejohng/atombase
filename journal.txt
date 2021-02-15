@@ -178,9 +178,16 @@ digit) and test_fenMoveCounter (is a digit)
 
 ACTION add check of error codes against 'unknown items'
 
+But first see todo.txt as I need to consider whether the current methodology
+just makes the program too complex and subject to possible error.
 
+14/2/21
 
+Major redesign
 
+Firstly set up a dictionary to hold the elements, rather than simple variables.
+By this method I hope to be able to identify elements of the fen in a more
+flexible way. 
 
 
 

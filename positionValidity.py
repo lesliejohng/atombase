@@ -30,56 +30,78 @@ class WarningMsg():
         self.dline()
 
 class Fen():
-    def __init__(self, fen):
-        self.fen = fen
-        self.fenElements = fen.split(' ')
-        self.fenBoard = self.fenElements[0]
-        self.errorLog = []
+
+    def __init__(self, fen ='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'):
+
+        # Variables required for checking fen elements
+            # A) castling
         self.validCastling =['-','q','kq','Q','Qq','Qk','Qkq','K',
-                    'Kq','Kkq','Kq','Kk','Kkq','KQ','KQq','KQk',
-                    'KQkq']
+                   'Kq','Kkq','Kq','Kk','Kkq','KQ','KQq','KQk',
+                   'KQkq']
+            # B) valid EP square
         self.validEPwtp = ['a6','b6','c6','d6','e6','f6','g6','h6']
         self.validEPbtp = ['a3','b3','c3','d3','e3','f3','g3','h3']
         self.validEPsquares = self.validEPwtp + self.validEPbtp
 
+        # temporary to be removed upon completion of re-write
+        self.errorLog = []
+
+        # initial processing
+        self.fen = fen
+        self.fenElements = fen.split(' ')
+        self.fenElementDict = {}
+        self.fenElementDict['fenBoard']= self.fenElements[0]
+
+    #def __init__(self, fen ='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'):
+    #    self.fen = fen
+    #    self.fenElements = fen.split(' ')
+    #    self.fenBoard =self.fenElements[0]
+    #    self.errorLog = []
+    #    self.validCastling =['-','q','kq','Q','Qq','Qk','Qkq','K',
+    #                'Kq','Kkq','Kq','Kk','Kkq','KQ','KQq','KQk',
+    #                'KQkq']
+    #    self.validEPwtp = ['a6','b6','c6','d6','e6','f6','g6','h6']
+    #    self.validEPbtp = ['a3','b3','c3','d3','e3','f3','g3','h3']
+    #    self.validEPsquares = self.validEPwtp + self.validEPbtp
+
         if len(self.fenElements) == 6:
             if self.testToPlay(self.fenElements[1]):
-                self.fenToPlay = self.fenElements[1]
-            else:
-                self.fenToPlay = 'unknown'
+                self.fenElementDict['fenToPlay'] = self.fenElements[1]
+            #else:
+                #self.fenToPlay = 'unknown'
 
             if self.testCastling(self.fenElements[2]):
-                self.fenCastling = self.fenElements[2]
-            else:
-                self.fenCastling = 'unknown'
+                self.fenElementDict['fenCastling'] = self.fenElements[2]
+            #else:
+                #self.fenCastling = 'unknown'
 
             if self.testEP(self.fenElements[3]):
-                self.fenEP = self.fenElements[3]
-            else:
-                self.fenEP = 'unkonwn'
+                self.fenElementDict['fenEP'] = self.fenElements[3]
+            #else:
+                #self.fenEP = 'unkonwn'
 
             if self.fenElements[4].isdigit():
-                self.fenHalfMoveClock = self.fenElements[4]
+                self.fenElementDict['fenHalfMoveClock'] = self.fenElements[4]
             else:
                 # as uncritical reset to 0
-                self.fenHalfMoveClock = '0'
+                self.fenElementDict['fenHalfMoveClock'] = '0'
 
             if self.fenElements[5].isdigit():
-                self.fenMoveCounter = self.fenElements[5]
+                self.fenElementDict['fenMoveCounter'] = self.fenElements[5]
             else:
                 # as uncritical reset to 1
-                self.fenMoveCounter = '1'
+                self.fenElementDict['fenMoveCounter'] = '1'
         else:
             # critical information
-            self.fenToPlay = 'unknown'
+            #self.fenToPlay = 'unknown'
             # critical information
-            self.fenCastling = 'unknown'
+            #self.fenCastling = 'unknown'
             # critical information
-            self.fenEP = 'unknown'
+            #self.fenEP = 'unknown'
             # non-critical reset to 0
-            self.fenHalfMoveClock = '0'
+            self.fenElementDict['fenHalfMoveClock'] = '0'
             # non-critical reset to 1
-            self.fenMoveCounter = '1'
+            self.fenElementDict['fenMoveCounter'] = '1'
 
             self.message = WarningMsg(header = 'Fen Error',
                 body = 'incomplete fen string',
@@ -88,8 +110,8 @@ class Fen():
             self.message
 
         self.testBoard()
-        self.fenErrorFlagCheck()
-        self.fenIncorrectFlagCheck()
+        #self.fenErrorFlagCheck()
+        #self.fenIncorrectFlagCheck()
 
         def __repr__(self):
          return self.fen
@@ -99,8 +121,8 @@ class Fen():
 
     # test that there are two kings on the fenBoard
     # one White and one Black
-        self.whiteKing = self.fenBoard.count('K')
-        self.blackKing = self.fenBoard.count('k')
+        self.whiteKing = self.fenElementDict['fenBoard'].count('K')
+        self.blackKing = self.fenElementDict['fenBoard'].count('k')
 
         if self.whiteKing == 0:
             self.message = WarningMsg(header = 'Illegal Position',
@@ -169,7 +191,7 @@ class Fen():
                 return True
             else:
                 if fenEP in self.validEPsquares:
-                    if self.fenToPlay == 'w':
+                    if self.fenElementDict.get('fenToPlay') == 'w':
                         if fenEP in self.validEPwtp:
                             return True
                         else:
@@ -179,7 +201,7 @@ class Fen():
                             self.message
                             return False
 
-                    if self.fenToPlay == 'b':
+                    if self.fenElementDict.get('fenToPlay') == 'b':
                         if fenEP in self.validEPbtp:
                             return True
                         else:
@@ -195,7 +217,7 @@ class Fen():
                     self.message
                     return False
 
-                if self.fenToPlay == 'unknown':
+                if self.fenElementDict.get('fenToPlay' ,'unknown') == 'unknown':
                     self.message = WarningMsg(header = 'EP square ' + fenEP,
                         body = 'It is not known who it is to play',
                         instruction = 'It is not possible to check the validity of the EP square')
@@ -210,33 +232,54 @@ class Fen():
             self.message
             return False
 
-    def fenIncorrectFlagCheck(self):
+    #def fenIncorrectFlagCheck(self):
         # check that fenBoard, fenHalfMoveClock, fenMoveCounter
         # have not been set to 'unknown'
-        if self.fenBoard == 'unknown':
-            self.errorLog.append('incorrectBoardFlag')
-        if not self.fenHalfMoveClock.isdigit():
-            self.errorLog.append('incorrectHalfMoveFlag')
-        if not self.fenMoveCounter.isdigit():
-            self.errorLog.append('incorrectMoveFlag')
+    #    self.OKflag = True
+    #    if self.fenElementDict['fenBoard' , 'unknown'] == 'unknown':
+    #        self.errorLog.append('incorrectBoardFlag')
+    #        self.message = WarningMsg(header = 'Error ' + fenEP,
+    #            body = 'The fenBoard element has been set to "unknown"',
+    #            instruction = 'This should never happen as this looses too much information')
+    #        self.OKflag = False
+    #    if not self.fenElementDict['fenHalfMoveClock'].isdigit():
+    #        self.errorLog.append('incorrectHalfMoveFlag')
+    #        self.message = WarningMsg(header = 'Error' + fenEP,
+    #            body = 'The fenHalfMoveClock clock element has been set to "unknown"',
+    #            instruction = 'If incorrect in original fen the figure should be reset to 0')
+    #        self.OKflag = False
+    #    if not self.fenElementDict['fenMoveCounter'].isdigit():
+    #        self.errorLog.append('incorrectMoveFlag')
+    #        self.message = WarningMsg(header = 'Error ' + fenEP,
+    #            body = 'The fenMove Counter has been set to "unknown"',
+    #            instruction = 'It incorrect in original fen the figure should be reset to 1')
+    #        self.OKflag = False
+    #    return self.OKflag
 
-    def fenErrorFlagCheck(self):
-        self.unknownCount = 0
-        if 'fenError' in self.errorLog:
-            if self.fenToPlay == 'unknown':
-                self.unknownCount += 1
-            if self.fenCastling == 'unknown':
-                self.unknownCount += 1
-            if self.fenEP == 'unknown':
-                self.unknownCount += 1
-            if self.unknownCount == 0:
-                self.errorLog.remove('fenError')
+    #def fenErrorFlagCheck(self):
+        #self.unknownCount = 0
+        # check whether fenError flag is correct
+        # if none of the elements are flagged as 'unknown'
+        # then the flag is incorrect
+        #self.fenIncorrectFlagCheck()
 
-
+        #if 'fenError' in self.errorLog:
+            # fenBoard is not checked as this should never
+            # be set to 'unknown'
+            #if self.fenToPlay == 'unknown':
+                #self.unknownCount += 1
+            #if self.fenCastling == 'unknown':
+                #self.unknownCount += 1
+            #if self.fenEP == 'unknown':
+                #self.unknownCount += 1
+            #if self.unknownCount == 0:
+                #self.errorLog.remove('fenError')
+            # fenHalfMoveClock and fenMoveCounter should always be a digit
 
 # initial test
-# test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
-# print(test.errorLog)
+# test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+# print(test.fenElementDict.get('fenEP', 'unknown'))
+
 
 
 
