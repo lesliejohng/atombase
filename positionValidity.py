@@ -1,10 +1,4 @@
-# approach
-# create fen class
-# define the representation of the class as a fen string
-# build into the fen class self checks about validity of the chess
-# position represented in the initial fen string
-# if possible the class will correct any errors in the initial fen
-# before outputting a valid string
+from colorama import Fore,Back,Style
 
 class WarningMsg():
     def __init__(self,
@@ -28,6 +22,14 @@ class WarningMsg():
         if self.instruction:
             print("\n     "+self.instruction+"\n")
         self.dline()
+
+# approach
+# create fen class
+# define the representation of the class as a fen string
+# build into the fen class self checks about validity of the chess
+# position represented in the initial fen string
+# if possible the class will correct any errors in the initial fen
+# before outputting a valid string
 
 class Fen():
 
@@ -53,6 +55,8 @@ class Fen():
             self.fenElementDict['fenBoard']= self.fenElements[0]
 
             if len(self.fenElements) == 6:
+                # the to play information is required to check the ep
+                # square, so this must be set first
                 self.fenElementDict['fenToPlay'] = self.identifyToPlay(self.fenElements[1])
                 self.fenElementDict['fenCastling'] = self.identifyCastling(self.fenElements[2])
                 self.fenElementDict['fenEP'] = self.identifyEP(self.fenElements[3])
@@ -71,14 +75,14 @@ class Fen():
                     body = 'incomplete fen string',
                     instruction = 'please check fen has all the required elements')
                 self.message
-                self.partFenInput()
+                self.directPartFenInput()
 
         else:
             self.message = WarningMsg(header = 'Fen Error',
                     body = 'input is not a string',
                     instruction = 'please re-input')
             self.message
-            self.fullFenInput()
+            self.directFullFenInput()
 
         self.testBoard()
 
@@ -115,22 +119,16 @@ class Fen():
     def identifyEP(self,fenEP):
         if fenEP == '-':
                 return fenEP
+        elif self.fenElementDict.get('fenToPlay') == 'w':
+            return self.identifyEPwtp(fenEP)
+        elif self.fenElementDict.get('fenToPlay') == 'b':
+            return self.identifyEPbtp(fenEP)
         else:
-            if not 'fenToPlay' in self.fenElementDict:
-                self.fenToPlayInput()
-            if self.fenElementDict.get('fenToPlay') == 'w':
-                return self.identifyEPwtp(fenEP)
-            else:
-                if self.fenElementDict.get('fenToPlay') == 'b':
-                    return self.identifyEPbtp(fenEP)
-                else:
-                    return self.epInput()
-
+            return self.epInput()
 
     def identifyEPwtp(self,fenEP):
-        if self.fenElementDict.get('fenToPlay') == 'w':
-            if fenEP in self.validEPwtp:
-                return fenEP
+        if fenEP in self.validEPwtp:
+            return fenEP
         else:
             self.message = WarningMsg(header = 'EP square: ' + str(fenEP),
                         body = 'The EP square is not valid in a "white to play" position')
@@ -146,22 +144,22 @@ class Fen():
             self.message
             return self.epInput()
 
-    # This section is for input routines
-    # these set the respective key in the dictionary directly
+    # This section is for input routines whre the routine
+    # test_fenElements the respective key in the dictionary directly
 
-    def inputBoard(self):
+    def directInputBoard(self):
         # temporary
         # set board to starting position
         self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
 
-    def amendBoard(self):
+    def directAmendBoard(self):
         # temporary
         # set board to starting position
         self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
         # eventually this will display the board and allow user to
         # amend it
 
-    def partFenInput(self):
+    def directPartFenInput(self):
         # case of incomplete fen
         # temporary
         # sets all but fenBoard as if it ws the starting position
@@ -171,7 +169,7 @@ class Fen():
         self.fenElementDict['fenHalfMoveClock'] = '0'
         self.fenElementDict['fenMoveCounter'] = '1'
 
-    def fullFenInput(self):
+    def directFullFenInput(self):
         # temporary
         # set these values to starting position
         self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
@@ -181,20 +179,22 @@ class Fen():
         self.fenElementDict['fenHalfMoveClock'] = '0'
         self.fenElementDict['fenMoveCounter'] = '1'
 
+    # this section is for input routines which return a corrected value
+
     def toPlayInput(self):
         # temporary
         # set ToPlay to white
-        self.fenElementDict['fenToPlay'] = 'w'
+        return 'w'
 
     def castlingInput(self):
         # temporary
         # set castling to call
-        self.fenElementDict['fenCastling'] = 'KQkq'
+        return 'KQkq'
 
     def epInput(self):
         # temporary
         # set ep to none
-        self.fenElementDict['fenEP'] = '-'
+        return '-'
 
     # This section is for deeper validity checks
     # these
@@ -207,7 +207,7 @@ class Fen():
                 self.message = WarningMsg(header = 'Board Error',
                     body = 'There are invalid characters in fenBoard')
                 self.message
-                self.inputBoard()
+                self.directInputBoard()
 
         # test that there are two kings on the fenBoard
         # one White and one Black
@@ -218,25 +218,25 @@ class Fen():
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no White King on the board')
             self.message
-            self.amendBoard()
+            self.directAmendBoard()
 
         if self.whiteKing > 1:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many White Kings on the Board')
             self.message
-            self.amendBoard()
+            self.directAmendBoard()
 
         if self.blackKing == 0:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no Black King on the board')
             self.message
-            self.amendBoard()
+            self.directAmendBoard()
 
         if self.blackKing > 1:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many Black Kings on the board')
             self.message
-            self.amendBoard()
+            self.directAmendBoard()
 
     def fenReconstruct(self):
         # this will recompile the elements into a valid fen

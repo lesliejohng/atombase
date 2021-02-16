@@ -174,12 +174,12 @@ def test_EPwtpInvalid():
 def test_EPbtpInvalid():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2')
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.fenElementDict.get('fenToPlay') == 'w'
+    assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
     # temporary: reset fenEP to '-'
     assert test.fenElementDict.get('fenEP') == '-'
     assert test.fenElementDict.get('fenHalfMoveClock') == '1'
-    assert test.fenElementDict.get('fenMoveCounter') == '2
+    assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_validHalfMove():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 5')
@@ -206,8 +206,8 @@ def test_validMoveCount():
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
     assert test.fenElementDict.get('fenEP') == '-'
-    assert test.fenElementDict.get('fenHalfMoveClock') == '0'
-    assert test.fenElementDict.get('fenMoveCounter') == '5'
+    assert test.fenElementDict.get('fenHalfMoveClock') == '1'
+    assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_invalidMoveCount():
     test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 x')
