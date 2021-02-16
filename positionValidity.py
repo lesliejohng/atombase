@@ -243,8 +243,8 @@ class Fen():
 
 
 # initial test
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
-print(test.fenElementDict.get('fenEP', 'unknown'))
+# test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+# print(test.fenElementDict.get('fenEP', 'unknown'))
 
 
 
