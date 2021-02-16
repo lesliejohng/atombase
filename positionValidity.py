@@ -86,7 +86,7 @@ class Fen():
         return self.fen
 
     # This section is for routines which identify fenElements
-    # these return a correct value for the respective element
+
 
     def identifyToPlay(self, fenToPlay):
         # ToPlay consists of a single 'w' or 'b' character
