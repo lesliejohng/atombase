@@ -240,15 +240,16 @@ class Fen():
 
 # This section is for simple display options
 
-    def displayBoard(self, board, toPlay = ''):
+    def displayBoard(self, board):
         print(board)
-        if not toPlay == '':
-            if toPlay == 'w':
-                print('  white to play\n')
-            elif toPlay == 'b':
-                print('  black to play\n')
-            else:
-                print('\n\n')
+
+    def displayToPlay(self, toPlay):
+        if toPlay == 'w':
+            print('  white to play\n')
+        elif toPlay == 'b':
+            print('  black to play\n')
+        else:
+            print('\n')
 
 # this section is for other items
 
@@ -276,12 +277,11 @@ class Fen():
 
 
 
-
-
 # initial test
 test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
 a = test.boardToString('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-test.displayBoard(board = a, toPlay = 'w')
+test.displayBoard(board = a)
+test.displayToPlay(toPlay = 'w')
 
 
 
