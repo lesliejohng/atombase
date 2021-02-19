@@ -241,35 +241,43 @@ class Fen():
 # This section is for simple display options
 
     def displayBoard(self, board):
-        print(board)
+        rankCount = 0
+        for rank in board:
+            print(board[rankCount])
+            rankCount += 1
 
     def displayToPlay(self, toPlay):
         if toPlay == 'w':
-            print('  white to play\n')
+            print('      white to play\n')
         elif toPlay == 'b':
-            print('  black to play\n')
+            print('      black to play\n')
         else:
             print('\n')
 
 # this section is for other items
 
-    def boardToString(self, board):
-        boardString = '\n  '
+    def boardToArray(self, board):
+        boardArray = ['\n      a   b   c   d   e   f   g   h  \n']
+        rank = '  8   '
+        rankCount = 8
         for char in board:
             if char == '/':
-                boardString += '\n  '
+                rank += ('\n')
+                boardArray.append(rank)
+                rankCount -= 1
+                rank = '  ' + str(rankCount) + '   '
             elif char in self.validBoardCharacters:
                 if char.isdigit():
                     count = int(char)
                     for x in range(count):
-                        boardString += '.  '
+                        rank += '.   '
                 else:
-                    boardString += char + '  '
+                    rank += char + '   '
             else:
-                boardString += '?  '
-        boardString += '\n'
+                rank += '?  '
+        boardArray.append(rank + '\n')
 
-        return boardString
+        return boardArray
 
     def fenReconstruct(self):
         # this will recompile the elements into a valid fen
@@ -279,7 +287,7 @@ class Fen():
 
 # initial test
 test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
-a = test.boardToString('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
+a = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
 test.displayBoard(board = a)
 test.displayToPlay(toPlay = 'w')
 

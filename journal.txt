@@ -187,9 +187,16 @@ Major redesign
 
 Firstly set up a dictionary to hold the elements, rather than simple variables.
 By this method I hope to be able to identify elements of the fen in a more
-flexible way. 
+flexible way.
 
+19/2/21
 
+added boardToString, displayBoard and displayToPlay
+
+added testpy, but found that string resulting from Board to string difficult
+to check. Re worked Board to String to convert it to an array.
+
+TO DO add pyTest re above
 
 
 
