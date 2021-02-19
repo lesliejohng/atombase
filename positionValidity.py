@@ -15,6 +15,7 @@ class WarningMsg():
         print('*' * self.asterixNo)
 
     def printMessage(self):
+        print('\n')
         self.dline()
         print("\n     "+self.header+"\n")
         print("\n     "+self.body+"\n")
@@ -237,14 +238,50 @@ class Fen():
             self.message
             self.directAmendBoard()
 
+# This section is for simple display options
+
+    def displayBoard(self, board, toPlay = ''):
+        print(board)
+        if not toPlay == '':
+            if toPlay == 'w':
+                print('  white to play\n')
+            elif toPlay == 'b':
+                print('  black to play\n')
+            else:
+                print('\n\n')
+
+# this section is for other items
+
+    def boardToString(self, board):
+        boardString = '\n  '
+        for char in board:
+            if char == '/':
+                boardString += '\n  '
+            elif char in self.validBoardCharacters:
+                if char.isdigit():
+                    count = int(char)
+                    for x in range(count):
+                        boardString += '.  '
+                else:
+                    boardString += char + '  '
+            else:
+                boardString += '?  '
+        boardString += '\n'
+
+        return boardString
+
     def fenReconstruct(self):
         # this will recompile the elements into a valid fen
         pass
 
 
+
+
+
 # initial test
-# test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
-# print(test.fenElementDict.get('fenEP', 'unknown'))
+test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+a = test.boardToString('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
+test.displayBoard(board = a, toPlay = 'w')
 
 
 
