@@ -257,15 +257,13 @@ class Fen():
 # this section is for other items
 
     def boardToArray(self, board):
-        boardArray = ['\n      a   b   c   d   e   f   g   h  \n']
-        rank = '  8   '
-        rankCount = 8
+        boardArray = []
+        rank = '  '
         for char in board:
             if char == '/':
                 rank += ('\n')
                 boardArray.append(rank)
-                rankCount -= 1
-                rank = '  ' + str(rankCount) + '   '
+                rank = '  '
             elif char in self.validBoardCharacters:
                 if char.isdigit():
                     count = int(char)
@@ -276,8 +274,19 @@ class Fen():
             else:
                 rank += '?  '
         boardArray.append(rank + '\n')
-
         return boardArray
+
+    def augmentBoard(self, boardArray):
+        augmentedBoard = []
+        augmentedBoard.append('\n        a   b   c   d   e   f   g   h  \n')
+        augmentedRank = '  8   '
+        rankCount = 8
+        for rank in boardArray:
+            augmentedRank = augmentedRank + rank
+            augmentedBoard.append(augmentedRank)
+            rankCount -= 1
+            augmentedRank = '  ' + str(rankCount) + '   '
+        return augmentedBoard
 
     def fenReconstruct(self):
         # this will recompile the elements into a valid fen
@@ -286,10 +295,13 @@ class Fen():
 
 
 # initial test
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
-a = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-test.displayBoard(board = a)
-test.displayToPlay(toPlay = 'w')
+#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+#a = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
+#print(a)
+#b = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
+#test.displayBoard(board = a)
+#test.displayBoard(test.augmentBoard(boardArray = b))
+
 
 
 
