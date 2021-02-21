@@ -281,7 +281,7 @@ class Fen():
                     else:
                         rank += char + '   '
             else:
-                rank += '?  '
+                rank += '?   '
         boardArray.append(rank + '\n')
         return boardArray
 
@@ -304,12 +304,17 @@ class Fen():
 
 
 # initial test
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
-a = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-print(a)
-b = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-test.displayBoard(board = a)
-test.displayBoard(test.augmentBoard(boardArray = b))
+#test = Fen('rnbqkbxr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
+#a = test.boardToArray('rnbqkbxr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
+#print('\n')
+#print(a)
+#print('\n')
+#b = test.augmentBoard(a)
+#print('\n')
+#print(b)
+#print('\n')
+#test.displayBoard(a)
+#test.displayBoard(b)
 
 
 
