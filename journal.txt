@@ -211,3 +211,11 @@ this array. Move the augmentation to a separate function (augmentBoard)
 3. make new function augmentBoard
 4. check output of boardToArrayOld same as boardToArray + augmentBoard
 5. delete boardToArrayOld
+
+Added coloured test using colorama
+
+Added pytest for above
+
+21/2/21
+
+added query routine w/b

@@ -186,10 +186,15 @@ class Fen():
 
     # this section is for input routines which return a corrected value
 
-    def toPlayInput(self):
-        # temporary
-        # set ToPlay to white
-        return 'w'
+    def toPlayInput(self,newToPlay='?'):
+        wb = ''
+        print('\n Is it white or black is to play in this position?')
+        while newToPlay not in 'wb':
+            wb = input('\n please input "w" or "b" \n')
+            newToPlay = wb.lower()
+            if newToPlay not in 'wb':
+                print('\n*** input incorrect ***\n')
+        return newToPlay
 
     def castlingInput(self):
         # temporary
@@ -299,24 +304,20 @@ class Fen():
 
     def fenReconstruct(self):
         # this will recompile the elements into a valid fen
-        pass
-
+        a = self.fenElementDict.get('fenBoard')+' '
+        b = self.fenElementDict.get('fenToPlay')+' '
+        c = self.fenElementDict.get('fenCastling')+' '
+        d = self.fenElementDict.get('fenEP')+' '
+        e = self.fenElementDict.get('fenHalfMoveClock')+' '
+        f = self.fenElementDict.get('fenMoveCounter')
+        return a + b + c + d + e + f
 
 
 # initial test
-#test = Fen('rnbqkbxr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
-#a = test.boardToArray('rnbqkbxr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-#print('\n')
-#print(a)
-#print('\n')
-#b = test.augmentBoard(a)
-#print('\n')
-#print(b)
-#print('\n')
-#test.displayBoard(a)
-#test.displayBoard(b)
-
-
+test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R x KQkq - 1 2')
+print(test.fenElementDict.get('fenToPlay'))
+print(test.fen)
+print(test.fenReconstruct())
 
 
 
