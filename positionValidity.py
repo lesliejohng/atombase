@@ -1,3 +1,6 @@
+from colorama import init
+init()
+from colorama import Fore, Back, Style
 
 class WarningMsg():
     def __init__(self,
@@ -17,6 +20,8 @@ class WarningMsg():
     def printMessage(self):
         print('\n')
         self.dline()
+        c = Fore.RED
+        d = Style.RESET_ALL
         print("\n     "+self.header+"\n")
         print("\n     "+self.body+"\n")
         if self.instruction:
@@ -242,6 +247,7 @@ class Fen():
 
     def displayBoard(self, board):
         rankCount = 0
+        print('\n')
         for rank in board:
             print(board[rankCount])
             rankCount += 1
@@ -270,7 +276,10 @@ class Fen():
                     for x in range(count):
                         rank += '.   '
                 else:
-                    rank += char + '   '
+                    if char.islower():
+                        rank += Fore.RED + char + '   ' + Style.RESET_ALL
+                    else:
+                        rank += char + '   '
             else:
                 rank += '?  '
         boardArray.append(rank + '\n')
@@ -278,14 +287,14 @@ class Fen():
 
     def augmentBoard(self, boardArray):
         augmentedBoard = []
-        augmentedBoard.append('\n        a   b   c   d   e   f   g   h  \n')
-        augmentedRank = '  8   '
+        augmentedBoard.append(Fore.GREEN+'\n        a   b   c   d   e   f   g   h  \n'+Style.RESET_ALL)
+        augmentedRank = Fore.GREEN+'  8   '+Style.RESET_ALL
         rankCount = 8
         for rank in boardArray:
             augmentedRank = augmentedRank + rank
             augmentedBoard.append(augmentedRank)
             rankCount -= 1
-            augmentedRank = '  ' + str(rankCount) + '   '
+            augmentedRank = Fore.GREEN+'  ' + str(rankCount) + '   '+Style.RESET_ALL
         return augmentedBoard
 
     def fenReconstruct(self):
@@ -295,12 +304,12 @@ class Fen():
 
 
 # initial test
-#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
-#a = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-#print(a)
-#b = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-#test.displayBoard(board = a)
-#test.displayBoard(test.augmentBoard(boardArray = b))
+test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+a = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
+print(a)
+b = test.boardToArray('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
+test.displayBoard(board = a)
+test.displayBoard(test.augmentBoard(boardArray = b))
 
 
 

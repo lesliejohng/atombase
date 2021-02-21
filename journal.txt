@@ -194,21 +194,20 @@ flexible way.
 added boardToString, displayBoard and displayToPlay
 
 added testpy, but found that string resulting from Board to string difficult
-to check. Re worked Board to String to convert it to an array.
+to check. Re worked Board to String to convert it to an array. (dropped
+boardToString, added boardToArray). Added augmentation to boardToArray to
+display file letter and rank numbers.
 
 TO DO add pyTest re above
 
+20/2/21
 
+prior to writing pyTest I re-thought the augmentation of boardToArray
+I now feel that adding this to the array reduces the possible uses of
+this array. Move the augmentation to a separate function (augmentBoard)
 
-
-
-
-
-
-
-
-
-
-
-
-  #
+1. rename boardToArrayOld board
+2. rewrite boardToArray without augmentation
+3. make new function augmentBoard
+4. check output of boardToArrayOld same as boardToArray + augmentBoard
+5. delete boardToArrayOld
