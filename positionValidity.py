@@ -195,10 +195,10 @@ class Fen():
             return 'w'
         wb = ''
         print('\n Is it white or black is to play in this position?')
-        while newToPlay not in 'wb':
+        while str(newToPlay) not in 'wb':
             wb = input('\n please input "w" or "b" \n')
             newToPlay = wb.lower()
-            if newToPlay not in 'wb':
+            if str(newToPlay) not in 'wb':
                 print('\n*** input incorrect ***\n')
         return newToPlay
 

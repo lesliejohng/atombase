@@ -235,4 +235,9 @@ I think I am stuck with the mocking method.
 22/2/21
 
 After much internet research added mock to python and tested all good
-inputs to toPlayInput
+inputs to toPlayInput.
+
+To create an incorrect input followed by a correct input tried to use
+the pop method. This didn't work... it got stuck in a loop.
+The with.mock.patch obviously doesn't re-run so pop doesn't get
+repeated.

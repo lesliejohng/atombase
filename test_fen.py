@@ -311,3 +311,7 @@ def test_toPlayInputB():
 def test_toPlayInputb():
     with mock.patch('builtins.input',return_value = "b"):
         assert Fen.toPlayInput() == "b"
+
+def test_toPlayIncorrectInput():
+    with mock.patch('builtins.input',side_effect = ["K","w"]):
+        assert Fen.toPlayInput() == "w"
