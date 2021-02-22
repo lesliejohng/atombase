@@ -1,5 +1,6 @@
 import pytest
 from positionValidity import Fen, WarningMsg
+import mock
 
 @pytest.fixture
 def good_fen():
@@ -294,3 +295,19 @@ def test_boardDisplayBadChar():
     z = test.augmentBoard(y)
     assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m?   \x1b[31mr   \x1b[0m\n', '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '  .   .   .   .   .   .   .   .   \n', '  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '  .   .   .   .   P   .   .   .   \n', '  .   .   .   .   .   N   .   .   \n', '  P   P   P   P   .   P   P   P   \n', '  R   N   B   Q   K   B   .   R   \n']
     assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m', '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m?   \x1b[31mr   \x1b[0m\n', '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n', '\x1b[32m  5   \x1b[0m  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n', '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n', '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n', '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
+
+def test_toPlayInputW():
+    with mock.patch('builtins.input',return_value = "W"):
+        assert Fen.toPlayInput() == "w"
+
+def test_toPlayInputw():
+    with mock.patch('builtins.input',return_value = "w"):
+        assert Fen.toPlayInput() == "w"
+
+def test_toPlayInputB():
+    with mock.patch('builtins.input',return_value = "B"):
+        assert Fen.toPlayInput() == "b"
+
+def test_toPlayInputb():
+    with mock.patch('builtins.input',return_value = "b"):
+        assert Fen.toPlayInput() == "b"

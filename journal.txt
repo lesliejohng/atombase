@@ -231,3 +231,8 @@ to return a set result. This wouldn't work unless there was some way to
 identify which functions were being tested.
 
 I think I am stuck with the mocking method.
+
+22/2/21
+
+After much internet research added mock to python and tested all good
+inputs to toPlayInput
