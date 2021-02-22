@@ -109,7 +109,7 @@ class Fen():
                     body = str(fenToPlay)+' input is not valid',
                     instruction = 'should be either "w" or "b". Please re-input.')
             self.message
-            return self.toPlayInput()
+            return self.toPlayInput(newToPlay = fenToPlay, testList = self.testList)
 
     def identifyCastling(self,fenCastling):
         if not 'fenToPlay' in self.fenElementDict.keys():
@@ -189,8 +189,9 @@ class Fen():
 
     # this section is for input routines which return a corrected value
 
-    def toPlayInput(self,newToPlay='?'):
-        if 'toPlay' in self.testList:
+    @staticmethod
+    def toPlayInput(newToPlay = '?',testList = []):
+        if 'toPlay' in testList:
             return 'w'
         wb = ''
         print('\n Is it white or black is to play in this position?')
@@ -319,10 +320,10 @@ class Fen():
 
 
 # initial test
-#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R x KQkq - 1 2')
-#print(test.fenElementDict.get('fenToPlay'))
-#print(test.fen)
-#print(test.fenReconstruct())
+#print(Fen.toPlayInput('W'))
+#a = Fen()
+#print('toPlay = '+ a.toPlayInput())
+
 
 
 
