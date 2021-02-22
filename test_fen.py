@@ -1,5 +1,5 @@
 import pytest
-from positionValidity import WarningMsg, Fen
+from positionValidity import Fen, WarningMsg
 
 @pytest.fixture
 def good_fen():
@@ -12,8 +12,10 @@ def good_ep_fen():
     return Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e3 1 2')
 
 def test_missingFen():
-    # full reset to starting position
     test = Fen()
+    # full reset to starting position
+    # this is achieved by a default value for fen, consisting of the
+    # fen for the starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'w'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -22,9 +24,13 @@ def test_missingFen():
     assert test.fenElementDict.get('fenMoveCounter') == '1'
 
 def test_nonStringFen():
-    # temporary: full reset to starting position
-    test = Fen(5)
+    test = Fen( fen=5,
+            testList = ['board', 'toPlay', 'castling', 'ep', 'halfMove', 'move'])
+    # full reset to starting position
+    # this is achieved withing the class Fen, so requires a full List
+    # of tested elements
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+    # fenToPlay set to test default 'w'
     assert test.fenElementDict.get('fenToPlay') == 'w'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
     assert test.fenElementDict.get('fenEP') == '-'
@@ -32,10 +38,12 @@ def test_nonStringFen():
     assert test.fenElementDict.get('fenMoveCounter') == '1'
 
 def test_insufficientFen():
-    # temporary: fen Board is as given
-    # temporary: other elements reset to those in the starting position
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2',
+                testList = ['toPlay', 'castling', 'ep', 'halfMove', 'move'])
+    # reset all but board, as missing element requires input of all
+    # other elements of the fen
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    # fenToPlay set to test default 'w'
     assert test.fenElementDict.get('fenToPlay') == 'w'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
     assert test.fenElementDict.get('fenEP') == '-'
@@ -43,7 +51,8 @@ def test_insufficientFen():
     assert test.fenElementDict.get('fenMoveCounter') == '1'
 
 def test_invalidCharInBoard():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2x5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2x5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2',
+                testList = ['board'])
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'b'
@@ -54,7 +63,8 @@ def test_invalidCharInBoard():
 
 def test_noWhiteKing():
     # this checks that the absence of a white king results in an error
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+    test = Fen(fen ='rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2',
+                testList = ['board'])
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'b'
@@ -64,7 +74,8 @@ def test_noWhiteKing():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_manyWhiteKings():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKK1R b KQkq - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKK1R b KQkq - 1 2',
+                testList = ['board'])
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'b'
@@ -74,7 +85,8 @@ def test_manyWhiteKings():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_noBlackKing():
-    test = Fen('rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    test = Fen(fen = 'rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+                testList = ['board'])
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'b'
@@ -84,7 +96,8 @@ def test_noBlackKing():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_manyBlackKings():
-    test = Fen('rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    test = Fen(fen = 'rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+                testList = ['board'])
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'b'
@@ -94,17 +107,24 @@ def test_manyBlackKings():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_toPlayError():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R z KQkq - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R z KQkq - 1 2',
+                testList = ['toPlay'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    # temporary: reset fenTOPlay to 'w'
+    # fenToPlay set to test default 'w'
     assert test.fenElementDict.get('fenToPlay') == 'w'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
     assert test.fenElementDict.get('fenEP') == '-'
     assert test.fenElementDict.get('fenHalfMoveClock') == '1'
     assert test.fenElementDict.get('fenMoveCounter') == '2'
+    caseWhite = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
+    caseBlack = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
+    assert test.fenReconstruct() == caseWhite
+    test.fenElementDict['fenToPlay'] = 'b'
+    assert test.fenReconstruct() == caseBlack
 
 def test_CastlingError():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2',
+                testList = ['castling'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     # temporary: reset fenCastling to 'KQkq'
@@ -114,7 +134,8 @@ def test_CastlingError():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_EPNone():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+                testList = [])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -123,17 +144,20 @@ def test_EPNone():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_EPNoToPlayElement():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R - KQkq e6 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R - KQkq e6 1 2',
+                testList = [ 'toPlay', 'ep'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    # temporary: reset fenToPlay to 'w'
+    # fenToPlay reset to test default 'w'
     assert test.fenElementDict.get('fenToPlay') == 'w'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
+    # as fenToPlay reset to 'w', e6 is valid
     assert test.fenElementDict.get('fenEP') == 'e6'
     assert test.fenElementDict.get('fenHalfMoveClock') == '1'
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_EPInvalidSquare():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e5 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e5 1 2',
+                testList = ['ep'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -143,7 +167,8 @@ def test_EPInvalidSquare():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_EPwtpValid():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2',
+                testList = ['ep'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'w'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -152,7 +177,8 @@ def test_EPwtpValid():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_EPbtpValid():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e3 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e3 1 2',
+                testList = ['ep'])
     assert test.fenElementDict.get('fenBoard', 'unknown') != 'unknown'
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
@@ -162,7 +188,8 @@ def test_EPbtpValid():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_EPwtpInvalid():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2',
+                testList = ['ep'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'w'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -172,7 +199,8 @@ def test_EPwtpInvalid():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_EPbtpInvalid():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2',
+                testList = ['ep'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -182,7 +210,9 @@ def test_EPbtpInvalid():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_validHalfMove():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 5')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 5',
+                testList = [])
+    # halfMove is a digit, so no test
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -191,17 +221,20 @@ def test_validHalfMove():
     assert test.fenElementDict.get('fenMoveCounter') == '5'
 
 def test_invalidHalfMove():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - x 5')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - x 5',
+                testList = ['halfMove'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
     assert test.fenElementDict.get('fenEP') == '-'
-    # temporary: reset half move to 0
+    # reset half move to 0
     assert test.fenElementDict.get('fenHalfMoveClock') == '0'
     assert test.fenElementDict.get('fenMoveCounter') == '5'
 
 def test_validMoveCount():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+                testList = [])
+    # move is a digit so there is no test
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -210,17 +243,19 @@ def test_validMoveCount():
     assert test.fenElementDict.get('fenMoveCounter') == '2'
 
 def test_invalidMoveCount():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 x')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 x',
+                testList = ['move'])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
     assert test.fenElementDict.get('fenEP') == '-'
     assert test.fenElementDict.get('fenHalfMoveClock') == '1'
-    # temporary: reset fenMoveCounter to '1'
+    # reset fenMoveCounter to '1'
     assert test.fenElementDict.get('fenMoveCounter') == '1'
 
 def test_noError():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+                testList = [])
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.fenElementDict.get('fenToPlay') == 'b'
     assert test.fenElementDict.get('fenCastling') == 'KQkq'
@@ -259,6 +294,3 @@ def test_boardDisplayBadChar():
     z = test.augmentBoard(y)
     assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m?   \x1b[31mr   \x1b[0m\n', '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '  .   .   .   .   .   .   .   .   \n', '  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '  .   .   .   .   P   .   .   .   \n', '  .   .   .   .   .   N   .   .   \n', '  P   P   P   P   .   P   P   P   \n', '  R   N   B   Q   K   B   .   R   \n']
     assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m', '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m?   \x1b[31mr   \x1b[0m\n', '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n', '\x1b[32m  5   \x1b[0m  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n', '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n', '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n', '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
-
-def test_toPlayInput():
-    test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R x KQkq - 1 2')

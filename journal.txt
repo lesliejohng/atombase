@@ -219,3 +219,15 @@ Added pytest for above
 21/2/21
 
 added query routine w/b
+
+pytest has a problem with input routines, making running a automated test
+difficult. The main method appears to by mocking the input. I initially
+thought of bypassing the input command, but this doesn't 'prove' the
+imput correct.
+
+Alternative: testing input functions individually by direct access to
+them, catching the embedded inputs with a "testing = True" switch programmed
+to return a set result. This wouldn't work unless there was some way to
+identify which functions were being tested.
+
+I think I am stuck with the mocking method.

@@ -38,7 +38,9 @@ class WarningMsg():
 
 class Fen():
 
-    def __init__(self, fen ='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'):
+    def __init__(self,
+        fen ='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        testList = []):
 
         # Variables required for checking fen elements
             # A) castling
@@ -52,6 +54,7 @@ class Fen():
 
         # required
         self.fenElementDict = {}
+        self.testList = testList
 
         # initial processing
         if isinstance(fen, str):
@@ -187,6 +190,8 @@ class Fen():
     # this section is for input routines which return a corrected value
 
     def toPlayInput(self,newToPlay='?'):
+        if 'toPlay' in self.testList:
+            return 'w'
         wb = ''
         print('\n Is it white or black is to play in this position?')
         while newToPlay not in 'wb':
@@ -314,10 +319,10 @@ class Fen():
 
 
 # initial test
-test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R x KQkq - 1 2')
-print(test.fenElementDict.get('fenToPlay'))
-print(test.fen)
-print(test.fenReconstruct())
+#test = Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R x KQkq - 1 2')
+#print(test.fenElementDict.get('fenToPlay'))
+#print(test.fen)
+#print(test.fenReconstruct())
 
 
 
