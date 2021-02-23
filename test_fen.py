@@ -52,7 +52,7 @@ def test_insufficientFen():
     assert test.fenElementDict.get('fenMoveCounter') == '1'
 
 def test_invalidCharInBoard():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2x5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2',
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2x5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
                 testList = ['board'])
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
@@ -69,7 +69,8 @@ def test_noWhiteKing():
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'b'
-    assert test.fenElementDict.get('fenCastling') == 'KQkq'
+    # no white king
+    assert test.fenElementDict.get('fenCastling') == 'kq'
     assert test.fenElementDict.get('fenEP') == '-'
     assert test.fenElementDict.get('fenHalfMoveClock') == '1'
     assert test.fenElementDict.get('fenMoveCounter') == '2'
@@ -91,7 +92,8 @@ def test_noBlackKing():
     # temporary: reset board to starting position
     assert test.fenElementDict.get('fenBoard') == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
     assert test.fenElementDict.get('fenToPlay') == 'b'
-    assert test.fenElementDict.get('fenCastling') == 'KQkq'
+    #no black king
+    assert test.fenElementDict.get('fenCastling') == 'KQ'
     assert test.fenElementDict.get('fenEP') == '-'
     assert test.fenElementDict.get('fenHalfMoveClock') == '1'
     assert test.fenElementDict.get('fenMoveCounter') == '2'

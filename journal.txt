@@ -240,4 +240,87 @@ inputs to toPlayInput.
 To create an incorrect input followed by a correct input tried to use
 the pop method. This didn't work... it got stuck in a loop.
 The with.mock.patch obviously doesn't re-run so pop doesn't get
-repeated.
+repeated. Same problem occurs if I try to set return_value directly;
+
+got this working by changing return_value to side_effect
+
+committed 22/2/21
+
+In preparation for castlingInput added simple board search to see if
+Kings and Rooks are on their original squares.
+
+I made the classic mistake of changing too much. I was over-confident
+after my success with castling input and built a routine to check
+castling against K & R positions. This meant designing a fenToString
+method, a method to search that string to check the content of the
+e1, a1 , h1, e8, a8, and h8 squares AND the method to use this
+information. To make matters worst I saw a number of inconsistencies
+on the handling of arguments and tried to 'standardise them',
+
+The result was a number of broken methods and a castling check system
+which fails by resetting castling to '-' every time! I also am behind
+on writing suitable pytests for these new methods,
+
+23/2/21
+
+I will approach this self-created mess by
+  a)  Identifying the error in the checkCastling method
+  b)  Move the use of this function until after fenBoard has beeen
+      checked
+  c)  add pytest for fenToString
+  d)  add pytest for interrogateBoard
+  e)  add pytest for checkCastling
+  f)  notate Fen class
+  g)  group method within the Fen Class into types
+  h)  check that the passing of arguments within each method type is
+      consistent
+  i)  check that the default values within each method type is consistent
+  j)  check that return value is consistent within each method type
+  k)  build consistency checks in pyTest
+  l)  consider refactoring to make method groups into classes to reduce
+      duplication and enforce consistency within each method group
+
+I will call this the REFOS PROGRAM (REFOS = REcover From Own Stupidity)
+
+LORD please help me keep to this.
+
+REFOS a: Identify checkCastling error
+
+I can get the expected result by setting the default castling argument
+to 'KQkq'. corrected by adding temporary 'progress prints'. solution still
+works with defaul arguement set to '-', ACTION:
+      1) change default back to 'KQkq'
+      2) remove progress prints
+      3) test with changes to fen position
+      4) save progress in git
+
+In direct test I have identified a problem. I know, for example, that both
+kings have 'moved' and 'moved back' how do I show that? Currently the
+system sets KQkq based on the pieces current position only.
+
+The assumptions I will make on castling rights are:-
+      1)  if the original input fen was correct and gave '-' I will
+          assume this to be correct
+      2)  if the original input fen gave anything less than 'KQkq' I
+          will assume this to be correct
+      3)  if an incomplete string or an incorrect string was given I
+          will make no assumptions, but proceed with checkCastling and
+          inputCastling methods
+
+In terms of checkCastling, therefore
+      1)  if '-' given I will return '-'
+      2)  if a 'short fenCastling element' I will assume that any
+          castling option missing has been left off for a reason.
+          'q' >> 'q' or '-' depending on position of blk k & qr
+          'k' >>  'k' or '-' depending on position of blk k & kr
+          'kq' >> 'kq','q','k','-' depending on blk k, kr, qk positions
+          'Q' >>  'Q' or '-' depending on position of wht K and QR
+          'Qq' >> 'Qq','Q', 'q' or '-'
+          'Qkq' >> 'Qkq','Qk','Qq','kq','q','Q','-'
+      3)  if fenCastling not given then I will set castling according
+          to the position of the respective king and rook positions
+
+Rethinking checkCastling, therefore, gives the following:-
+  - if there is no fenCastling in the dictionary the arguments then no
+  castling argument will be passed to the method, the default being
+  set to '?'
