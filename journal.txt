@@ -284,7 +284,7 @@ I will call this the REFOS PROGRAM (REFOS = REcover From Own Stupidity)
 
 LORD please help me keep to this.
 
-REFOS a: Identify checkCastling error
+REFOS:b Identify checkCastling error
 
 I can get the expected result by setting the default castling argument
 to 'KQkq'. corrected by adding temporary 'progress prints'. solution still
@@ -324,3 +324,39 @@ Rethinking checkCastling, therefore, gives the following:-
   - if there is no fenCastling in the dictionary the arguments then no
   castling argument will be passed to the method, the default being
   set to '?'
+
+REFOS:b mpove use of checkCastling until after testBoard
+stage 1 moved checkCastling -done
+stage 2 rewrite directPartFenInput and directPartFenInput to match new
+        __init__ requirements
+
+27/2/21
+
+The last few days have proved to me that the 'type/test/improve' method
+of programming has serious faults. I changed something, the program
+failed and I found it difficult to identify where the fault lay. I,
+therefore, undertook a complete rewrite to a new python file (fenChecker.py).
+
+The new structure of __init__ is
+  1)  To check each element in turn
+        functions: checkBoard, checkToPlay, checkCastling, checkEP
+        NB incorrect halfMove and move elements are still rest to
+        0 and 1 respectively
+  2)  If the element appears correct the respective variables are set.
+      These have become simple variables, rather than being in a dictionary.
+        variables: board, toPlay, castling, ep, halfMove and move
+  3)  If the checking process identifies a possible fault the respective
+      input method is called. These are currently still set up as static
+      methods (to be reconsidered later).
+        input methods: inputBoard, inputToPlay inputCastling, inputEP
+        NB all these are decorated @staticmethod
+        NB there are no input methods for halfMove and move as these are
+        changed directly in __init__
+
+  These changes have made the program clearer. I am currently reconstructing
+  the pytests for these changes. the biggest change in the new pytest is
+  dropping default values and adding mocking of the input() function. This
+  has meant I can drop the check in each of the input methods which
+      -identified whether the call was from pytest and (if so)
+      -set the input method return to a pre-set default
+  

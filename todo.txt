@@ -1,41 +1,20 @@
-Before I proceed with the list below I need to re-think the testing
-process. Currently I am adding test both to positionValidity.py and
-test_fen.py. This is unnecessary as I can use pytest to make sure I
-have not changes anything.
-
 As for the external setting of variables I need to decide which are
 'protected' and change their names accordingly.
 
-I also need to decide whether the existance of two indicators of
-errors (one by settling a value to unknown, one by adding something
-into the error log) is a good system. Does it add a requirement to
-check for consistancy?
+I need to move back from the idea of the fenElementDict, as this creates
+a readability issue: make dictionary calls variables again.
+use Find> Replace All for this
 
-Should fen errors be corrected immediately, rather than 'hanging around'
-for example should there be an input request for 'Who is to play' if an
-error in fenToPlay is detected? This would seem to make the program
-simpler and require less checking later.
+Again readability move 'main processing routines' from __init__ to separate
+method
 
-How do I catch a non-string being input to the fen Class?
-
-Given the depth of these changes I need to picture how the whole
-program will work. What is the equivalent of main() in Python?
+Continue annotation of positionValidity.py
 
 *********************************************************************
-
-Identified changes
-The order of these changes are, therefore,
-  1 compare 'unknown' elements to error log
-  2 process required to clear all 'unknown' elements
-  3 rebuild full fen string (if all unknowns have been solved)
-  4 add board checking class
-
-Current Actions
-
-Continue checks on 'unknown' elements against errorLog entries
-
-***********************************************************************
 
 Other changes
 
 Add recognition of 50 move rule in checking of fenHalfMoveClock
+
+consider whether I was right to make each of the input methods a
+@staticmethod

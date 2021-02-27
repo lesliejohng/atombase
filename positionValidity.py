@@ -84,7 +84,9 @@ class Fen():
 
         # *************************************************************
 
-        # here I start to process the fen string into it's elements
+        # here I start to process the fen string into it's elements.
+        # __init__ is directly responsible for building
+        # fenElementDict
         if isinstance(fen, str):
             self.fen = fen
             self.fenElements = fen.split(' ')
@@ -101,22 +103,22 @@ class Fen():
                     #       format
                     #   b)  correct the input or
                     #   c)  allow the user to change the element
-                self.fenElementDict['fenToPlay'] = self.identifyToPlay(self.fenElements[1])
-                self.fenElementDict['fenCastling'] = self.identifyCastling(self.fenElements[2])
+                self.toPlay = self.identifyToPlay(self.fenElements[1])
+                self.castling = self.identifyCastling(self.fenElements[2])
                 self.fenElementDict['fenEP'] = self.identifyEP(self.fenElements[3])
                 if self.fenElements[4].isdigit():
-                    self.fenElementDict['fenHalfMoveClock'] = self.fenElements[4]
+                    self.fenElementDict['fenHalfMove'] = self.fenElements[4]
                 else:
                     # as this is not normally critical I reset a non digit to 0
                     # NB I keep fenHalfMoveClock and fen moveCounter as a string
                     # to allow easier reconstruction of a corrected fen
-                    self.fenElementDict['fenHalfMoveClock'] = '0'
+                    self.fenElementDict['fenHalfMove'] = '0'
                 if self.fenElements[5].isdigit():
-                    self.fenElementDict['fenMoveCounter'] = self.fenElements[5]
+                    self.fenElementDict['fenMove'] = self.fenElements[5]
                 else:
                     # as positions often reset the move number to 1 I reset it
                     # to 1 if the original fen element is a non digit
-                    self.fenElementDict['fenMoveCounter'] = '1'
+                    self.fenElementDict['fenMove'] = '1'
             else:
                 # If some of the later elements of the fen are missing I have
                 # decided to reset them completely
@@ -127,9 +129,18 @@ class Fen():
                 self.message
                 # Then I pass the processing onto a method which seeks
                 # input for each of them in turn
-                self.directPartFenInput()
+                self.response = self.directPartFenInput()
+                # I receive a collection from this method which is
+                # allocated as follows
+                self.toPlay = self.response[0]
+                self.castling = self.response[1]
+                self.fenElementDict['fenEP'] = self.response[2]
+                self.fenElementDict['fenHalfMove'] = self.response[3]
+                self.fenElementDict['fenMove'] = self.response[4]
+
 
         else:
+            # **ICO** fen not a string
             # Here I capture the situation where the provided fen
             # is not a string and ...
             self.message = WarningMsg(header = 'Fen Error',
@@ -137,9 +148,18 @@ class Fen():
                     instruction = 'please re-input')
             self.message
             # ... ask for the whole fen string to be re-input
-            self.directFullFenInput()
+            self.response = self.directFullFenInput()
+            # I recieve from this method a collection in the following
+            # order
+            self.fenElementDict['fenBoard'] = self.response[0]
+            self.toPlay = self.response[1]
+            self.castling = self.response[2]
+            self.fenElementDict['fenEP'] = self.response[3]
+            self.fenElementDict['fenHalfMove'] = self.response[4]
+            self.fenElementDict['fenMove'] = self.response[5]
 
-        self.testBoard()
+        self.fenElementDict['fenBoard'] = self.testBoard()
+        self.checkCastling(castling = self.fenElementDict.get('fenCastling'))
 
     def __repr__(self):
         return self.fen
@@ -163,7 +183,7 @@ class Fen():
             self.toPlayInput()
 
         if fenCastling in self.validCastling:
-            return self.checkCastling(castling = fenCastling)
+            return fenCastling
         else:
             self.message = WarningMsg(header = 'Castling: '+str(fenCastling),
                     body = 'The Castling Element is not in a valid form',
@@ -207,12 +227,26 @@ class Fen():
     def directInputBoard(self):
         # temporary
         # set board to starting position
-        self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+        return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
 
-    def directAmendBoard(self):
+    def directAmendBoard(self, board = ''):
         # temporary
         # set board to starting position
-        self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+        if board == '':
+            if isinstance(self.fenElementDict.get('fenBoard'),str):
+                board = self.fenElementDict.get('fenBoard')
+        else:
+            board = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+        newBoard = ''
+
+        for char in board:
+            if char in self.validBoardCharacters:
+                newBoard += char
+            else:
+                #temp eventually user input Here
+                newBoard += 'p'
+
+        return newBoard
         # eventually this will display the board and allow user to
         # amend it
 
@@ -220,21 +254,15 @@ class Fen():
         # case of incomplete fen
         # temporary
         # sets all but fenBoard as if it ws the starting position
-        self.fenElementDict['fenToPlay'] = 'w'
-        self.fenElementDict['fenCastling'] = 'KQkq'
-        self.fenElementDict['fenEP'] = '-'
-        self.fenElementDict['fenHalfMoveClock'] = '0'
-        self.fenElementDict['fenMoveCounter'] = '1'
+        return ['w', 'KQkq', '-', '0', '1']
 
     def directFullFenInput(self):
         # temporary
         # set these values to starting position
-        self.fenElementDict['fenBoard'] = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
-        self.fenElementDict['fenToPlay'] = 'w'
-        self.fenElementDict['fenCastling'] = 'KQkq'
-        self.fenElementDict['fenEP'] = '-'
-        self.fenElementDict['fenHalfMoveClock'] = '0'
-        self.fenElementDict['fenMoveCounter'] = '1'
+        newBoard = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+            # temp will receive input of new board string from user
+
+        return [newBoard] + self.directPartFenInput()
 
     # this section is for input routines which return a corrected value
 
@@ -272,13 +300,14 @@ class Fen():
         # this is a series of tests on the board to see if it valid
         if board == '':
             board = self.fenElementDict.get('fenBoard')
+        newBoard = ''
         # test if fenBoard element contains only valid characters
         for char in board:
             if not char in self.validBoardCharacters:
                 self.message = WarningMsg(header = 'Board Error',
                     body = 'There are invalid characters in fenBoard')
                 self.message
-                self.directInputBoard()
+                newBoard = self.directAmendBoard()
 
         # test that there are two kings on the fenBoard
         # one White and one Black
@@ -289,25 +318,27 @@ class Fen():
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no White King on the board')
             self.message
-            self.directAmendBoard()
+            newBoard = self.directAmendBoard()
 
         if self.whiteKing > 1:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many White Kings on the Board')
             self.message
-            self.directAmendBoard()
+            newBoard = self.directAmendBoard()
 
         if self.blackKing == 0:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There is no Black King on the board')
             self.message
-            self.directAmendBoard()
+            newBoard = self.directAmendBoard()
 
         if self.blackKing > 1:
             self.message = WarningMsg(header = 'Illegal Position',
                 body = 'There are too many Black Kings on the board')
             self.message
-            self.directAmendBoard()
+            newBoard = self.directAmendBoard()
+
+        return newBoard
 
     def checkCastling(self, board = '', castling = '?'):
 
@@ -446,7 +477,7 @@ class Fen():
 
     def interrogateBoard(self, targetSquare, boardString = '' ):
         if boardString == '':
-            boardString = fenElementDict.get('fenBoard')
+            boardString = self.fenElementDict.get('fenBoard')
         return boardString[self.squareToFenPosition(targetSquare)]
 
     def fenReconstruct(self):
@@ -455,93 +486,93 @@ class Fen():
         b = self.fenElementDict.get('fenToPlay')+' '
         c = self.fenElementDict.get('fenCastling')+' '
         d = self.fenElementDict.get('fenEP')+' '
-        e = self.fenElementDict.get('fenHalfMoveClock')+' '
-        f = self.fenElementDict.get('fenMoveCounter')
+        e = self.fenElementDict.get('fenHalfMove')+' '
+        f = self.fenElementDict.get('fenMove')
         return a + b + c + d + e + f
 
 
 # initial test
-#print('****************************************************************')
-#print('test all castling OK')
-#fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
-#board = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-#test = Fen(fen)
-#a = test.boardToString(board=board)
-#print(a)
-#print(len(a))
-#boardString = test.boardToString(board)
-#b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
-#print('The piece on e8 is a ' + b)
-#c = test.checkCastling(board =board, castling = 'KQkq')
-#print('castling passed "KQkq" : ' + c)
-#c = test.checkCastling(board =board, castling = '-')
-#print('castling passed "-" : ' + c)
-#c = test.checkCastling(board =board, castling = 'kq')
-#print('castling passed "kq" : ' + c)
-#c = test.checkCastling(board =board)
-#print('castling nothing passed: ' + c)
-#c = test.checkCastling(board =board, castling = "?")
-#print('castling question mark element passed: ' + c)
+print('****************************************************************')
+print('test all castling OK')
+fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
+board = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+test = Fen(fen)
+a = test.boardToString(board=board)
+print(a)
+print(len(a))
+boardString = test.boardToString(board)
+b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
+print('The piece on e8 is a ' + b)
+c = test.checkCastling(board =board, castling = 'KQkq')
+print('castling passed "KQkq" : ' + c)
+c = test.checkCastling(board =board, castling = '-')
+print('castling passed "-" : ' + c)
+c = test.checkCastling(board =board, castling = 'kq')
+print('castling passed "kq" : ' + c)
+c = test.checkCastling(board =board)
+print('castling nothing passed: ' + c)
+c = test.checkCastling(board =board, castling = "?")
+print('castling question mark element passed: ' + c)
 
-#print('****************************************************************')
-#print('test Black King moved')
-#fen = 'rnbkqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
-#board = 'rnbkqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-#test = Fen(fen)
-#a = test.boardToString(board=board)
-#print(a)
-#print(len(a))
-#boardString = test.boardToString(board)
-#b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
-#print('The piece on e8 is a ' + b)
-#c = test.checkCastling(board =board, castling = 'KQkq')
-#print('castling passed "KQkq" : ' + c)
-#c = test.checkCastling(board =board, castling = '-')
-#print('castling passed "-" : ' + c)
-#c = test.checkCastling(board =board, castling = 'kq')
-#print('castling passed "kq" : ' + c)
-#c = test.checkCastling(board =board)
-#print('castling nothing passed: ' + c)
-#c = test.checkCastling(board =board, castling = "?")
-#print('castling question mark element passed: ' + c)
+print('****************************************************************')
+print('test Black King moved')
+fen = 'rnbkqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
+board = 'rnbkqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+test = Fen(fen)
+a = test.boardToString(board=board)
+print(a)
+print(len(a))
+boardString = test.boardToString(board)
+b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
+print('The piece on e8 is a ' + b)
+c = test.checkCastling(board =board, castling = 'KQkq')
+print('castling passed "KQkq" : ' + c)
+c = test.checkCastling(board =board, castling = '-')
+print('castling passed "-" : ' + c)
+c = test.checkCastling(board =board, castling = 'kq')
+print('castling passed "kq" : ' + c)
+c = test.checkCastling(board =board)
+print('castling nothing passed: ' + c)
+c = test.checkCastling(board =board, castling = "?")
+print('castling question mark element passed: ' + c)
 
-#print('****************************************************************')
-#print('test Wht QR moved')
-#fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/1NBQKB1R b KQkq - 1 2'
-#board = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/1NBQKB1R'
-#test = Fen(fen)
-#a = test.boardToString(board=board)
-#print(a)
-#print(len(a))
-#boardString = test.boardToString(board)
-#b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
-#print('The piece on e8 is a ' + b)
-#c = test.checkCastling(board =board, castling = 'KQkq')
-#print('castling passed "KQkq" : ' + c)
-#c = test.checkCastling(board =board, castling = '-')
-#print('castling passed "-" : ' + c)
-#c = test.checkCastling(board =board, castling = 'kq')
-#print('castling passed "kq" : ' + c)
-#c = test.checkCastling(board =board)
-#print('castling nothing passed: ' + c)
-#c = test.checkCastling(board =board, castling = "?")
-#print('castling question mark element passed: ' + c)
+print('****************************************************************')
+print('test Wht QR moved')
+fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/1NBQKB1R b KQkq - 1 2'
+board = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/1NBQKB1R'
+test = Fen(fen)
+a = test.boardToString(board=board)
+print(a)
+print(len(a))
+boardString = test.boardToString(board)
+b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
+print('The piece on e8 is a ' + b)
+c = test.checkCastling(board =board, castling = 'KQkq')
+print('castling passed "KQkq" : ' + c)
+c = test.checkCastling(board =board, castling = '-')
+print('castling passed "-" : ' + c)
+c = test.checkCastling(board =board, castling = 'kq')
+print('castling passed "kq" : ' + c)
+c = test.checkCastling(board =board)
+print('castling nothing passed: ' + c)
+c = test.checkCastling(board =board, castling = "?")
+print('castling question mark element passed: ' + c)
 
-#print('****************************************************************')
-#print('test Wht K moved and moved back')
-#fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
-#board = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-#test = Fen(fen)
-#a = test.boardToString(board=board)
-#print(a)
-#print(len(a))
-#boardString = test.boardToString(board)
-#b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
-#print('The piece on e8 is a ' + b)
-#c = test.checkCastling(board =board, castling = 'kq')
-#print('castling passed "kq" to show white K moved and moved back: ' + c)
+print('****************************************************************')
+print('test Wht K moved and moved back')
+fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
+board = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+test = Fen(fen)
+a = test.boardToString(board=board)
+print(a)
+print(len(a))
+boardString = test.boardToString(board)
+b = test.interrogateBoard(boardString = boardString, targetSquare = 'e8')
+print('The piece on e8 is a ' + b)
+c = test.checkCastling(board =board, castling = 'kq')
+print('castling passed "kq" to show white K moved and moved back: ' + c)
 
-#print('****************************************************************')
+print('****************************************************************')
 
 
 
