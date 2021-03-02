@@ -68,6 +68,11 @@ class Fen():
         #          anywhere in the fen that value will be checked
 
         self.elementCount = len(self.fenElements)
+        if self.elementCount != 6:
+            # here there is a risk that a '-' element would be
+            # wrongly allocated to a particular element
+            self.fenElements = ['?' if i=='-' else i for i in self.fenElements]
+            # replace '-' with '?' in fenElements
 
         # Here I am identifying obvious elements
         self.toPlay = '?'
@@ -77,33 +82,24 @@ class Fen():
 
             # does element look like a ToPlay element?
             if len(element) == 1 and element in 'wb':
-                # has ToPlay already been set?
-                if self.toPlay != '?':
-                    # is it a duplicated element?
-                    if element != self.toPlay:
-                        # the fen in contrdictory
+                if self.toPlay != '?': # has ToPlay already been set?
+                    if element != self.toPlay: # the fen is contrdictory
                         self.toPlay = 'unclear'
                 else: # not duplicated
                     self.toPlay = element
 
             # does element look like a castling element?
             if element in self.recognisedCastling:
-                # has castling already been set?
-                if self.castling != '?':
-                    # is it a duplicated element?
+                if self.castling != '?': # has castling already been set?
                     if element != self.castling:
-                        # the fen in contrdictory
-                        self.castling = 'unclear'
+                        self.castling = 'unclear' # the fen is contrdictory
                 else: # not duplicated
                     self.castling = element
 
             # does element look like a ep element?
             if len(element) == 2 and element in self.recognisedEP:
-                # has ep already been set?
-                if self.ep != '?':
-                    # is it a duplicated element?
-                    if element != self.ep:
-                        # the fen in contradictory
+                if self.ep != '?': # has ep already been set?
+                    if element != self.ep: # the fen is contradictory
                         self.ep = 'unclear'
                 else: # not duplicated
                     self.ep = element
@@ -126,7 +122,7 @@ class Fen():
             self.castling = self.checkCastling(castling = self.castling, board = self.board)
         elif self.elementCount > 2:
             # this will pick up '-' (no castling rights)
-            self.castling = self.checkCastling(castling = self.toPlay, board = self.board)
+            self.castling = self.checkCastling(castling = self.fenElements[3], board = self.board)
         else:
             self.castling = self.checkCastling(castling = '?', board = self.board)
 
@@ -139,7 +135,7 @@ class Fen():
 
         # if penultimate item on list is a digit
         # take this as the halfMove
-        if self.elementCount > 3: # must have board + 2 elements
+        if self.elementCount > 2: # must have board element plus at least 2 elements
             if self.fenElements[-2].isdigit() and self.fenElements[-1].isdigit():
             # the penultimate sub-string is not accepted is the last sub-string
             # is not also a digit
@@ -153,7 +149,7 @@ class Fen():
 
         # if last item on list is a digit
         # take this as the move
-        if self.elementCount > 2: # must have board + 1 other sub-string
+        if self.elementCount > 1: # must have board + at least 1 other sub-string
             if self.fenElements[-1].isdigit(): # floats rejected as invalid
                 self.move = self.fenElements[-1]
             else:

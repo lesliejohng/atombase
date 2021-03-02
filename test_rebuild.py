@@ -95,19 +95,19 @@ def test_nonStringFenBool():
 #          AND the last sub-string is ALSO A DIGIT
 
 def test_noBoardSubstring():
-    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R',
-    'w','KQkq','-']): # half move and move accepted and not reset
-        test = Fen(fen = 'w KQkq - 1 2')
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R', '-']): # half move and move accepted and not reset
+        test = Fen(fen = 'w KQkq - 5 20') # toPlay and castling should be recognised
         # no board element passed
-        # only the last two items accepted
+        # last two items accepted as they are digits
+        assert test.fenElements == ['w', 'KQkq', '?', '5', '20']
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
         # fenToPlay set to test default 'w'
         assert test.toPlay == 'w'
         assert test.castling == 'KQkq'
         assert test.ep == '-'
-        assert test.halfMove == '1'
-        assert test.move == '2'
-        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
+        assert test.halfMove == '5'
+        assert test.move == '20'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 5 20'
 
 # -------------------- fen passed with missing elements (1) -------------------
 # NB this depends on my assumptions that
