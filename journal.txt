@@ -359,4 +359,20 @@ The new structure of __init__ is
   has meant I can drop the check in each of the input methods which
       -identified whether the call was from pytest and (if so)
       -set the input method return to a pre-set default
-  
+
+1/3/2021
+
+Whilst changing something major is a problem complication especially before
+completing the pytest regime. My wish is, however, to be a little more
+flexible. Currently if the elements of the fen are provided, but out of
+order, they cannot be recognised. It is clear, however, that:-
+      1) an element 'w' must be the toPlay element
+      2) an element 'KQkq' must be the castling element and
+      3) an element 'e3' must be a epSquare
+
+If I continue with the current pytest, however, I will need to perform a
+complete a complete re-write of the pytests. For this reason I will introduce
+this change before completing the pytest rebuild.
+
+ACTION
+1. added indentification of toPlay element 

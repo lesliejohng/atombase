@@ -20,20 +20,22 @@ class WarningMsg():
 
 class Fen():
 
-    def __init__(self, fen = ''):
+    def __init__(self, fen = '?'):
 
         # these variables to help check elements of the fen
         # A) castling
-        self.validBoardCharacters = '12345678/kqrnbpKQRBNP'
-        self.validCastling =['-','q','k','kq','Q','Qq','Qk','Qkq','K',
+        self.recognisedCastling = ['q','k','kq','Q','Qq','Qk','Qkq','K',
                    'Kq','Kk','Kkq','KQ','KQq','KQk',
-                   'KQkq'] # copy changes to inputCastling()
+                   'KQkq']
+        self.validCastling = self.recognisedCastling
+        self.validCastling.append('-')
         # B) EP square
+        self.recognisedEP =['a6','b6','c6','d6','e6','f6','g6','h6',
+                            'a3','b3','c3','d3','e3','f3','g3','h3']
         self.validEPwtp = ['-','a6','b6','c6','d6','e6','f6','g6','h6']
-                # copy changes to inputEP()
         self.validEPbtp = ['-','a3','b3','c3','d3','e3','f3','g3','h3']
-                # copy changes to inputEP()
-        # C) board squares
+        # C) board
+        self.validBoardCharacters = '12345678/kqrnbpKQRBNP'
         self.validSquares = ('a8','b8','c8','d8','e8','f8','g8','h8',
                             'a7','b7','c7','d7','e7','f7','g7','h7',
                             'a6','b6','c6','d6','e6','f6','g6','h6',
@@ -43,46 +45,119 @@ class Fen():
                             'a2','b2','c2','d2','e2','f2','g2','h2',
                             'a1','b1','c1','d1','e1','f1','g1','h1')
         # D) other
-        self.errors = [] # used in the  method
+        self.errors = [] # used in the checkBoard method
 
         # processing of the fen starts here
         fen = str(fen) # forcing fen argument to a string
+
+        # splitting fen into sub-strings
         self.fen = fen
         self.fenElements = fen.split(' ')
+
+        # processing the sub-strings
+
+        # In handling a string input I have made the following
+        # assumptions
+        #       1) the first sub-string is always the board
+        #       2) the last sub-string is always the move counter
+        #          IF IT IS A DIGIT
+        #       3) the penultimate sub-string is always the
+        #          half move clock IF IT IS A DIGIT and the
+        #          last sub-string IS ALSO A DIGIT
+        #       4) if a toPlay, castling or ep element is recognised
+        #          anywhere in the fen that value will be checked
+
         self.elementCount = len(self.fenElements)
-        print(self.elementCount)
+
+        # Here I am identifying obvious elements
+        self.toPlay = '?'
+        self.castling = '?'
+        self.ep = '?'
+        for element in self.fenElements:
+
+            # does element look like a ToPlay element?
+            if len(element) == 1 and element in 'wb':
+                # has ToPlay already been set?
+                if self.toPlay != '?':
+                    # is it a duplicated element?
+                    if element != self.toPlay:
+                        # the fen in contrdictory
+                        self.toPlay = 'unclear'
+                else: # not duplicated
+                    self.toPlay = element
+
+            # does element look like a castling element?
+            if element in self.recognisedCastling:
+                # has castling already been set?
+                if self.castling != '?':
+                    # is it a duplicated element?
+                    if element != self.castling:
+                        # the fen in contrdictory
+                        self.castling = 'unclear'
+                else: # not duplicated
+                    self.castling = element
+
+            # does element look like a ep element?
+            if len(element) == 2 and element in self.recognisedEP:
+                # has ep already been set?
+                if self.ep != '?':
+                    # is it a duplicated element?
+                    if element != self.ep:
+                        # the fen in contradictory
+                        self.ep = 'unclear'
+                else: # not duplicated
+                    self.ep = element
+
+        if self.toPlay == 'unclear':
+            self.toPlay = '?'
+        if self.castling == 'unclear':
+            self.castling = '?'
+        if self.ep == 'unclear':
+            self.ep = '?'
+
         self.board = self.checkBoard(board = self.fenElements[0])
 
-        if self.elementCount > 1: # toPlay element
-            self.toPlay = self.checkToPlay(self.fenElements[1])
+        if self.toPlay != '?': # toPlay element recognised in fen
+            self.toPlay = self.checkToPlay(toPlay = self.toPlay)
         else:
             self.toPlay = self.checkToPlay(toPlay = '?')
 
-        if self.elementCount > 2: # castling element
-            self.castling = self.checkCastling(board = self.board, castling = self.toPlay)
+        if self.castling != '?': #castling element recognised in fen
+            self.castling = self.checkCastling(castling = self.castling, board = self.board)
+        elif self.elementCount > 2:
+            # this will pick up '-' (no castling rights)
+            self.castling = self.checkCastling(castling = self.toPlay, board = self.board)
         else:
-            self.castling = self.checkCastling(board = self.board, castling = "?")
+            self.castling = self.checkCastling(castling = '?', board = self.board)
 
-        if self.elementCount > 3: # ep element
-            self.ep = self.checkEP(toPlay = self.toPlay)
+        if self.ep != '?': # ep element recognised
+            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay)
+        elif self.elementCount > 3:
+            self.ep = self.checkEP(ep = self.fenElements[3], toPlay = self.toPlay)
         else:
-            self.ep = self.inputEP(toPlay = self.toPlay)
+            self.ep = self.checkEP(ep = '?', toPlay = self.toPlay)
 
-        if self.elementCount > 4:
-            if self.fenElements[4].isdigit():
-                self.halfMove = self.fenElements[4]
+        # if penultimate item on list is a digit
+        # take this as the halfMove
+        if self.elementCount > 3: # must have board + 2 elements
+            if self.fenElements[-2].isdigit() and self.fenElements[-1].isdigit():
+            # the penultimate sub-string is not accepted is the last sub-string
+            # is not also a digit
+                self.halfMove = self.fenElements[-2]
             else:
-                # reset value
+                # reset value to 0
                 self.halfMove = '0'
         else:
             # set to '0'
             self.halfMove = '0'
 
-        if self.elementCount > 5:
-            if self.fenElements[5].isdigit():
-                self.move = self.fenElements[5]
+        # if last item on list is a digit
+        # take this as the move
+        if self.elementCount > 2: # must have board + 1 other sub-string
+            if self.fenElements[-1].isdigit(): # floats rejected as invalid
+                self.move = self.fenElements[-1]
             else:
-                # reset value
+                # reset value to 1
                 self.move = '1'
         else:
             #set to '1'
@@ -97,12 +172,18 @@ class Fen():
     def checkBoard(self, board):
         # this is a series of tests on the board to see if it valid
         newBoard = ''
-        self.errors.append('first time check')
-        # test if fenBoard element contains only valid characters
+        # to force while loop to run
+        self.errors.append('first time flag')
+
 
         while not self.errors == []:
-            # if the number of squares in the board is not 64 then some of the
-            # subsequent methods will not work
+
+            # to remove flag
+            if 'first time flag' in self.errors:
+                self.errors.pop(self.errors.index('first time flag'))
+
+            # if the number of squares in the board is not 64 then some of
+            # the subsequent methods will not work
             boardString = self.boardToString(board, checkBoard = True)
                 # the boardToString method returns a string of 64 characters
                 # but also appends errors to self.errors if the original board
@@ -212,25 +293,25 @@ class Fen():
             newCastling = '-'
         return newCastling
 
-    def checkEP(self, ep):
+    def checkEP(self, ep, toPlay):
 
         if not ep == '-':
-            if self.toPlay == 'w':
+            if toPlay == 'w':
                 if ep in self.validEPwtp:
                     newEP = ep
                 else:
                     message = WarningMsg(header = 'EP square: ' + str(ep),
                             body = 'The EP square is not valid in a "white to play" position')
                     message
-                    newEP = self.epInput(toPlay  = 'w')
-            elif self.toPlay == 'b':
+                    newEP = self.inputEP(toPlay  = 'w')
+            elif toPlay == 'b':
                 if ep in self.validEPbtp:
                     newEP = ep
                 else:
                     message = WarningMsg(header = 'EP square' + str(ep),
                             body = 'The EP square is not valid in a "black to play" position')
                     message
-                    newEP = self.epInput(toPlay = 'b')
+                    newEP = self.inputEP(toPlay = 'b')
         else:
             newEP = ep
 
@@ -307,9 +388,9 @@ class Fen():
         printable = ''
         for i in range(64):
             if i % 8 == 0:
-                printable += '\n   '+boardString[i]
+                printable += '\n  '+boardString[i]
             else:
-                printable += '   '+boardString[i]
+                printable += '  '+boardString[i]
 
         print(printable)
 
