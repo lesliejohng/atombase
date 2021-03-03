@@ -25,10 +25,9 @@ class Fen():
         # these variables to help check elements of the fen
         # A) castling
         self.recognisedCastling = ['q','k','kq','Q','Qq','Qk','Qkq','K',
-                   'Kq','Kk','Kkq','KQ','KQq','KQk',
-                   'KQkq']
-        self.validCastling = self.recognisedCastling
-        self.validCastling.append('-')
+                   'Kq','Kk','Kkq','KQ','KQq','KQk','KQkq']
+        self.validCastling = ['-','q','k','kq','Q','Qq','Qk','Qkq','K',
+                   'Kq','Kk','Kkq','KQ','KQq','KQk','KQkq']
         # B) EP square
         self.recognisedEP =['a6','b6','c6','d6','e6','f6','g6','h6',
                             'a3','b3','c3','d3','e3','f3','g3','h3']
@@ -65,51 +64,61 @@ class Fen():
         #          half move clock IF IT IS A DIGIT and the
         #          last sub-string IS ALSO A DIGIT
         #       4) if a toPlay, castling or ep element is recognised
-        #          anywhere in the fen that value will be checked
+        #          anywhere in the fen that value will be saved
 
         self.elementCount = len(self.fenElements)
-        if self.elementCount != 6:
-            # here there is a risk that a '-' element would be
-            # wrongly allocated to a particular element
-            self.fenElements = ['?' if i=='-' else i for i in self.fenElements]
-            # replace '-' with '?' in fenElements
 
         # Here I am identifying obvious elements
         self.toPlay = '?'
         self.castling = '?'
         self.ep = '?'
-        for element in self.fenElements:
 
+        print('Before recognition')
+        print('toPlay: ', self.toPlay, ' ', type(self.toPlay))
+        print('castling: ', self.castling, ' ', type(self.castling))
+        print('ep square: ', self.ep, ' ', type(self.ep))
+        print('elements: ', self.fenElements)
+
+        for element in self.fenElements:
             # does element look like a ToPlay element?
             if len(element) == 1 and element in 'wb':
-                if self.toPlay != '?': # has ToPlay already been set?
-                    if element != self.toPlay: # the fen is contrdictory
-                        self.toPlay = 'unclear'
-                else: # not duplicated
-                    self.toPlay = element
-
+                self.toPlay = element
             # does element look like a castling element?
-            if element in self.recognisedCastling:
-                if self.castling != '?': # has castling already been set?
-                    if element != self.castling:
-                        self.castling = 'unclear' # the fen is contrdictory
-                else: # not duplicated
-                    self.castling = element
-
+            elif element in self.recognisedCastling:
+                self.castling = element
             # does element look like a ep element?
-            if len(element) == 2 and element in self.recognisedEP:
-                if self.ep != '?': # has ep already been set?
-                    if element != self.ep: # the fen is contradictory
-                        self.ep = 'unclear'
-                else: # not duplicated
-                    self.ep = element
+            elif element in self.recognisedEP:
+                self.ep = element
 
-        if self.toPlay == 'unclear':
-            self.toPlay = '?'
-        if self.castling == 'unclear':
-            self.castling = '?'
-        if self.ep == 'unclear':
-            self.ep = '?'
+        #variable check
+        print('After recognition')
+        print('toPlay: ', self.toPlay)
+        print('castling: ', self.castling)
+        print('ep square: ', self.ep)
+
+        countBlank = '-' in self.fenElements
+        if countBlank > 1: # implies no castling rights and no ep square
+            # a recognised castling or ep string may have been identified
+            pass
+        elif countBlank == 1: # problem here is which to apply the element
+            if self.castling != '?' and self.ep != '?':
+                pass  # any '-' will be ignored as castling and ep set
+            elif self.castling != '?':
+                # '-' must relate to ep square
+                self.ep = '-'
+            elif self.ep != '?':
+                # '-' must relate to castling right
+                self.castling = '-'
+            else: # castling and ep element not set
+                # it is not clear whether a single '-' relates to
+                # castling or ep, replace '-' with '?', forcing input
+                self.fenElements = ['?' if i=='-' else i for i in self.fenElements]
+
+        #variable check
+        print('After "-" check')
+        print('toPlay: ', self.toPlay)
+        print('castling: ', self.castling)
+        print('ep square: ', self.ep)
 
         self.board = self.checkBoard(board = self.fenElements[0])
 

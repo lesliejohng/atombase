@@ -21,7 +21,7 @@ def good_ep_fen():
     # an enemy pawn positioned to perform a ep capture. ie only when it matters!
     # The following position is after 1 e4 e6 2 e5 d5 when white could play
     # 3 exd6 e.p.
-    return Fen('rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR # w KQkq e3 0 3')
+    return Fen('rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3')
 
 # -----------------------------------------------------------------------------
 
@@ -95,11 +95,11 @@ def test_nonStringFenBool():
 #          AND the last sub-string is ALSO A DIGIT
 
 def test_noBoardSubstring():
-    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R', '-']): # half move and move accepted and not reset
-        test = Fen(fen = 'w KQkq - 5 20') # toPlay and castling should be recognised
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']): # half move and move accepted and not reset
+        test = Fen(fen = 'w KQkq - 5 20') # toPlay, castling and ep should be recognised
         # no board element passed
         # last two items accepted as they are digits
-        assert test.fenElements == ['w', 'KQkq', '?', '5', '20']
+        assert test.fenElements == ['w', 'KQkq', '-', '5', '20']
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
         # fenToPlay set to test default 'w'
         assert test.toPlay == 'w'
@@ -117,14 +117,26 @@ def test_noBoardSubstring():
 
 def test_insufficientFen():
     with mock.patch('builtins.input',side_effect = ['w','KQkq','-']): # full reset to starting position
-        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2')
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq 1 2')
         # reset all but board, as missing element requires input of all
         # other elements of the fen
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-        # fenToPlay set to test default 'w'
         assert test.toPlay == 'w'
         assert test.castling == 'KQkq'
         assert test.ep == '-'
         assert test.halfMove == '1'
         assert test.move == '2'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
+
+# -------------------- fen elements out of order ------------------------------
+# valid toPlay, castling and ep should be recognised
+
+def test_orderFenValidEP():
+    test = Fen(fen = 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR d6 w KQkq 0 3')
+    assert test.board == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
