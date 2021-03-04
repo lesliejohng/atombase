@@ -95,10 +95,14 @@ class Fen():
         print('castling: ', self.castling)
         print('ep square: ', self.ep)
 
-        countBlank = '-' in self.fenElements
+        countBlank = self.fenElements.count('-')
+        print('countBlank: ', countBlank)
         if countBlank > 1: # implies no castling rights and no ep square
-            # a recognised castling or ep string may have been identified
-            pass
+            # if castling and ep not set make these '-'
+            if self.castling == '?':
+                self.castling = '-'
+            if self.ep == '?':
+                self.ep = '-'
         elif countBlank == 1: # problem here is which to apply the element
             if self.castling != '?' and self.ep != '?':
                 pass  # any '-' will be ignored as castling and ep set
@@ -111,7 +115,9 @@ class Fen():
             else: # castling and ep element not set
                 # it is not clear whether a single '-' relates to
                 # castling or ep, replace '-' with '?', forcing input
-                self.fenElements = ['?' if i=='-' else i for i in self.fenElements]
+                if self.castling == '?' and self.ep == '?':
+                    # force input of castling and ep
+                    self.fenElements = ['?' if i=='-' else i for i in self.fenElements]
 
         #variable check
         print('After "-" check')

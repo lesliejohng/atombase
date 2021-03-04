@@ -133,6 +133,64 @@ def test_insufficientFen():
         assert test.move == '2'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
 
+# -------------------- test allocation of '-' ---------------------------------
+
+def test_ep_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == 'KQkq'
+    assert test.ep == '-'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_castling_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - e3 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == '-'
+    assert test.ep == 'e3'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_castling_ep_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - - 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == '-'
+    assert test.ep == '-'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_2Blanks_castling_set():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - - KQkq 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == 'KQkq'
+    assert test.ep == '-'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_2Blanks_ep_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - -  e3 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == '-'
+    assert test.ep == 'e3'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_castling_ep_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - - 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == '-'
+    assert test.ep == '-'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+# -----------------------------------------------------------------------------
+
 # -------------------- fen elements incorrect ---------------------------------
 
 def test_toPlayError():
@@ -148,7 +206,7 @@ def test_toPlayError():
 def test_CastlingError():
     with mock.patch('builtins.input',side_effect = ['KQkq', '-']):
         # as the castling element is unrecognisable, '-'
-        # cannot be allocated, so sp needs to be set
+        # cannot be allocated, so ep needs to be set
         test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2')
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
         assert test.toPlay == 'b'
