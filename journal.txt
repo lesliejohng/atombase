@@ -375,4 +375,8 @@ complete a complete re-write of the pytests. For this reason I will introduce
 this change before completing the pytest rebuild.
 
 ACTION
-1. added indentification of toPlay element 
+1. added indentification of toPlay element
+
+4/3/21
+
+added pytest re board error: king

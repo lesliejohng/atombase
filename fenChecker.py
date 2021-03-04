@@ -55,16 +55,15 @@ class Fen():
 
         # processing the sub-strings
 
-        # In handling a string input I have made the following
-        # assumptions
+        # In handling a string input I have made the following assumptions
         #       1) the first sub-string is always the board
-        #       2) the last sub-string is always the move counter
-        #          IF IT IS A DIGIT
-        #       3) the penultimate sub-string is always the
-        #          half move clock IF IT IS A DIGIT and the
-        #          last sub-string IS ALSO A DIGIT
+        #       2) the last sub-string is always the move counter IF A DIGIT and fen
+        #          has more at least 2 elements
+        #       3) the penultimate sub-string is always the half move clock IF A DIGIT
+        #          AND the last sub-string is ALSO A DIGIT and the fen has as least
+        #          3 elements
         #       4) if a toPlay, castling or ep element is recognised
-        #          anywhere in the fen that value will be saved
+
 
         self.elementCount = len(self.fenElements)
 

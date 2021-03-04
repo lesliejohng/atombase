@@ -103,8 +103,9 @@ def test_nonStringFenBool():
 # -------------------- test sub-string assumptions (1) ------------------------
 
 def test_noBoardSubstring():
-    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']): # half move and move accepted and not reset
-        test = Fen(fen = 'w KQkq - 5 20') # toPlay, castling and ep should be recognised
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen(fen = 'w KQkq - 5 20')
+        # toPlay, castling and ep should be recognised
         # no board element passed
         # last two items accepted as they are digits
         assert test.fenElements == ['w', 'KQkq', '-', '5', '20']
@@ -120,10 +121,10 @@ def test_noBoardSubstring():
 # -------------------- fen passed with missing elements (1) -------------------
 
 def test_insufficientFen():
-    with mock.patch('builtins.input',side_effect = ['w','KQkq','-']): # full reset to starting position
+    with mock.patch('builtins.input',side_effect = ['w','KQkq','-']):
         test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq 1 2')
-        # reset all but board, as missing element requires input of all
-        # other elements of the fen
+        # reset all but board and halfMove/move, as missing element
+        # requires input of all other elements of the fen
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
         assert test.toPlay == 'w'
         assert test.castling == 'KQkq'
@@ -131,6 +132,32 @@ def test_insufficientFen():
         assert test.halfMove == '1'
         assert test.move == '2'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
+
+# -------------------- fen elements incorrect ---------------------------------
+
+def test_toPlayError():
+    with mock.patch('builtins.input',side_effect = ['w']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R z KQkq - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_CastlingError():
+    with mock.patch('builtins.input',side_effect = ['KQkq', '-']):
+        # as the castling element is unrecognisable, '-'
+        # cannot be allocated, so sp needs to be set
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+# -----------------------------------------------------------------------------
 
 # -------------------- fen elements out of order ------------------------------
 # valid toPlay, castling and ep should be recognised
@@ -151,6 +178,7 @@ def test_noWhiteKing():
     # this checks that the absence of a white king results in an error
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
         test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+        # input fo corrected board element
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
         assert test.toPlay == 'b'
         assert test.castling == 'KQkq'
@@ -161,6 +189,7 @@ def test_noWhiteKing():
 def test_manyWhiteKings():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
         test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBKKB1R b KQkq - 1 2')
+        # input fo corrected board element
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
         assert test.toPlay == 'b'
         assert test.castling == 'KQkq'
@@ -171,6 +200,7 @@ def test_manyWhiteKings():
 def test_noBlackKing():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
         test = Fen(fen = 'rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+        # input fo corrected board element
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
         assert test.toPlay == 'b'
         assert test.castling == 'KQkq'
@@ -181,6 +211,7 @@ def test_noBlackKing():
 def test_manyBlackKings():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
         test = Fen(fen = 'rnbkkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+        # input fo corrected board element
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
         assert test.toPlay == 'b'
         assert test.castling == 'KQkq'
