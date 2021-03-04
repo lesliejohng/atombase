@@ -4,7 +4,7 @@ import mock
 
 startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
-# manual count of tests = 6
+# manual count of tests = 24
 
 # -------------------- Fixtures -----------------------------------------------
 
@@ -39,7 +39,7 @@ def good_ep_fen():
 
 # -----------------------------------------------------------------------------
 
-# -------------------- tests: non-string fen (4) ------------------------------
+# -------------------- tests: non-string fen (4 tests: total 4) ---------------
 
 def test_missingFen():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
@@ -100,7 +100,7 @@ def test_nonStringFenBool():
 
 # -----------------------------------------------------------------------------
 
-# -------------------- test sub-string assumptions (1) ------------------------
+# -------------------- test sub-string assumptions (test 1 total 5) -----------
 
 def test_noBoardSubstring():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']):
@@ -118,7 +118,7 @@ def test_noBoardSubstring():
         assert test.move == '20'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 5 20'
 
-# -------------------- fen passed with missing elements (1) -------------------
+# -------------------- fen passed with missing elements (tests 1: total 6) ----
 
 def test_insufficientFen():
     with mock.patch('builtins.input',side_effect = ['w','KQkq','-']):
@@ -133,7 +133,7 @@ def test_insufficientFen():
         assert test.move == '2'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
 
-# -------------------- test allocation of '-' ---------------------------------
+# -------------------- test allocation of '-' (tests 5: total 11) -------------
 
 def test_ep_None():
     test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
@@ -180,18 +180,9 @@ def test_2Blanks_ep_None():
     assert test.halfMove == '1'
     assert test.move == '2'
 
-def test_castling_ep_None():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - - 1 2')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == '-'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
+# ------------------------------------------------------------------
 
-# -----------------------------------------------------------------------------
-
-# -------------------- fen elements incorrect ---------------------------------
+# -------------------- fen elements incorrect (tests 2: total 13) -------------
 
 def test_toPlayError():
     with mock.patch('builtins.input',side_effect = ['w']):
@@ -217,7 +208,7 @@ def test_CastlingError():
 
 # -----------------------------------------------------------------------------
 
-# -------------------- ep invalid squares -------------------------------------
+# -------------------- ep invalid squares (tests 5: total 18) -----------------
 
 def test_epInvalidSquare():
     with mock.patch('builtins.input',side_effect = ['-']):
@@ -270,10 +261,9 @@ def test_epbtpInvalid():
         assert test.halfMove == '1'
         assert test.move == '2'
 
-
 # -----------------------------------------------------------------------------
 
-# -------------------- fen elements out of order ------------------------------
+# -------------------- fen elements out of order (tests 1: total 19) ----------
 # valid toPlay, castling and ep should be recognised
 
 def test_orderFenValidEP():
@@ -286,7 +276,7 @@ def test_orderFenValidEP():
     assert test.move == '3'
     assert str(test) == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-# ------------------- board errors: kings -------------------------------------
+# ------------------- board errors: kings (tests 4 : total 23)-----------------
 
 def test_noWhiteKing():
     # this checks that the absence of a white king results in an error
@@ -332,3 +322,54 @@ def test_manyBlackKings():
         assert test.ep == '-'
         assert test.halfMove == '1'
         assert test.move == '2'
+
+# -------------------- test board display (2 test: total 25) ------------------
+
+def test_boardDisplay():
+    test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    y = test.boardToArray('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R')
+    assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+        '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+        '  .   .   .   .   .   .   .   .   \n',
+        '  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+        '  .   .   .   .   P   .   .   .   \n',
+        '  .   .   .   .   .   N   .   .   \n',
+        '  P   P   P   P   .   P   P   P   \n',
+        '  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard(y)
+    z = test.augmentBoard()
+    assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m',
+    '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+    '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+    '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n',
+    '\x1b[32m  5   \x1b[0m  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+    '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n',
+    '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n',
+    '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n',
+    '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard(z)
+
+def test_boardDisplayNotExplicit():
+    test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    y = test.boardToArray('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R')
+    assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+        '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+        '  .   .   .   .   .   .   .   .   \n',
+        '  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+        '  .   .   .   .   P   .   .   .   \n',
+        '  .   .   .   .   .   N   .   .   \n',
+        '  P   P   P   P   .   P   P   P   \n',
+        '  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard()
+    z = test.augmentBoard()
+    assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m',
+    '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+    '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+    '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n',
+    '\x1b[32m  5   \x1b[0m  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+    '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n',
+    '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n',
+    '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n',
+    '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard()
+# -----------------------------------------------------------------------------

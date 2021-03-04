@@ -72,12 +72,6 @@ class Fen():
         self.castling = '?'
         self.ep = '?'
 
-        print('Before recognition')
-        print('toPlay: ', self.toPlay, ' ', type(self.toPlay))
-        print('castling: ', self.castling, ' ', type(self.castling))
-        print('ep square: ', self.ep, ' ', type(self.ep))
-        print('elements: ', self.fenElements)
-
         for element in self.fenElements:
             # does element look like a ToPlay element?
             if len(element) == 1 and element in 'wb':
@@ -89,14 +83,8 @@ class Fen():
             elif element in self.recognisedEP:
                 self.ep = element
 
-        #variable check
-        print('After recognition')
-        print('toPlay: ', self.toPlay)
-        print('castling: ', self.castling)
-        print('ep square: ', self.ep)
-
         countBlank = self.fenElements.count('-')
-        print('countBlank: ', countBlank)
+
         if countBlank > 1: # implies no castling rights and no ep square
             # if castling and ep not set make these '-'
             if self.castling == '?':
@@ -118,12 +106,6 @@ class Fen():
                 if self.castling == '?' and self.ep == '?':
                     # force input of castling and ep
                     self.fenElements = ['?' if i=='-' else i for i in self.fenElements]
-
-        #variable check
-        print('After "-" check')
-        print('toPlay: ', self.toPlay)
-        print('castling: ', self.castling)
-        print('ep square: ', self.ep)
 
         self.board = self.checkBoard(board = self.fenElements[0])
 
@@ -395,6 +377,9 @@ class Fen():
 
     def displayBoardString(self, boardString = ''):
 
+        if boardString == '':
+            self.boardToArray()
+
         printable = ''
         for i in range(64):
             if i % 8 == 0:
@@ -403,6 +388,16 @@ class Fen():
                 printable += '  '+boardString[i]
 
         print(printable)
+
+    def displayBoard(self, boardArray = ''):
+
+        if boardArray == '':
+            self.boardToArray()
+
+        print('\n')
+        for rank in boardArray:
+            print(rank)
+        print('\n')
 
     def displayToPlay(self, toPlay = ''):
         if toPlay == '':
@@ -458,6 +453,7 @@ class Fen():
     def boardToArray(self, board = ''):
         if board == '':
             board = self.board
+
         boardArray = []
         rank = '  '
         for char in board:
@@ -482,11 +478,14 @@ class Fen():
 
     def augmentBoard(self, boardArray = []):
         if boardArray == [] :
-            boardArray = self.fenElementDict.get['fenBoard']
+            boardArray = self.boardToArray(self.board)
+
         augmentedBoard = []
+
         augmentedBoard.append(Fore.GREEN+'\n        a   b   c   d   e   f   g   h  \n'+Style.RESET_ALL)
         augmentedRank = Fore.GREEN+'  8   '+Style.RESET_ALL
         rankCount = 8
+
         for rank in boardArray:
             augmentedRank = augmentedRank + rank
             augmentedBoard.append(augmentedRank)
@@ -517,3 +516,12 @@ class Fen():
 
 
 # initial test
+
+# display given vaules
+test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+# value not given
+x = test.boardToArray()
+test.displayBoard(x)
+str(x)
+y = test.augmentBoard(x)
+test.displayBoard(y)

@@ -384,3 +384,5 @@ added pytest re board error: king
 added pytest for blank elements
 
 added pytest for invalid ep elements
+
+added pytest re board display
