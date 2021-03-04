@@ -25,6 +25,20 @@ def good_ep_fen():
 
 # -----------------------------------------------------------------------------
 
+# -------------------- assumptions --------------------------------------------
+
+# In handling a string input I have made the following assumptions
+#       1) the first sub-string is always the board
+#       2) the last sub-string is always the move counter IF A DIGIT and fen
+#          has more at least 2 elements
+#       3) the penultimate sub-string is always the half move clock IF A DIGIT
+#          AND the last sub-string is ALSO A DIGIT and the fen has as least
+#          3 elements
+#       4) if a toPlay, castling or ep element is recognised
+#          anywhere in the fen that value will be saved
+
+# -----------------------------------------------------------------------------
+
 # -------------------- tests: non-string fen (4) ------------------------------
 
 def test_missingFen():
@@ -88,12 +102,6 @@ def test_nonStringFenBool():
 
 # -------------------- test sub-string assumptions (1) ------------------------
 
-# In handling a string input I have made the following assumptions
-#       1) the first sub-string is always the board
-#       2) the last sub-string is always the move counter IF A DIGIT
-#       3) the penultimate sub-string is always the half move clock IF A DIGIT
-#          AND the last sub-string is ALSO A DIGIT
-
 def test_noBoardSubstring():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']): # half move and move accepted and not reset
         test = Fen(fen = 'w KQkq - 5 20') # toPlay, castling and ep should be recognised
@@ -110,10 +118,6 @@ def test_noBoardSubstring():
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 5 20'
 
 # -------------------- fen passed with missing elements (1) -------------------
-# NB this depends on my assumptions that
-#       1) the first sub-string is always the board
-#       2) the last sub-string is always the move counter IF A DIGIT
-#       3) the preultimate sub-string is always the half move clock IF A DIGIT
 
 def test_insufficientFen():
     with mock.patch('builtins.input',side_effect = ['w','KQkq','-']): # full reset to starting position
@@ -140,3 +144,46 @@ def test_orderFenValidEP():
     assert test.halfMove == '0'
     assert test.move == '3'
     assert str(test) == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+# ------------------- board errors: kings -------------------------------------
+
+def test_noWhiteKing():
+    # this checks that the absence of a white king results in an error
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_manyWhiteKings():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBKKB1R b KQkq - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_noBlackKing():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_manyBlackKings():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbkkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
