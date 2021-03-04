@@ -217,6 +217,62 @@ def test_CastlingError():
 
 # -----------------------------------------------------------------------------
 
+# -------------------- ep invalid squares -------------------------------------
+
+def test_epInvalidSquare():
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e5 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        # manual reset ep to '-'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_epwtpValid():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'e6'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_epbtpValid():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e3 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'e3'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_epwtpInvalid():
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        # temporary: reset fentest.ep to '-'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_epbtpInvalid():
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        # ep reset to '-'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+
+# -----------------------------------------------------------------------------
+
 # -------------------- fen elements out of order ------------------------------
 # valid toPlay, castling and ep should be recognised
 

@@ -380,3 +380,7 @@ ACTION
 4/3/21
 
 added pytest re board error: king
+
+added pytest for blank elements
+
+added pytest for invalid ep elements
