@@ -393,3 +393,5 @@ added pytest for missing Elements
 
 added pytest for white space between elements, leading shite space and
 trailing white space
+
+added pytest for white space within board

@@ -325,6 +325,18 @@ def test_fenTrailingWhiteSpace():
     assert test.move == '3'
     assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
+def test_fenWhiteSpaceInBoard():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR']):
+        # will require re-input of board
+        test = Fen(fen = 'rnbqkbnr/pp1pppp p/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
 # -----------------------------------------------------------   1 test: total 21
 
 # -------------------- fen elements incorrect ---------------------------------
