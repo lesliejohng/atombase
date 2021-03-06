@@ -242,9 +242,9 @@ def test_fenMissingDigit():
     assert test.move == '3'
     assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-# ----------------------------------------------------------- 5 tests: total 14
+# ----------------------------------------------------------- 6 tests: total 15
 
-# -------------------- test allocation of '-' (tests 5: total 15) -------------
+# -------------------- test allocation of '-' ---------------------------------
 
 def test_ep_None():
     test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
@@ -291,9 +291,23 @@ def test_2Blanks_ep_None():
     assert test.halfMove == '1'
     assert test.move == '2'
 
-# ------------------------------------------------------------------
+# ----------------------------------------------------------- 5 tests: total 20
 
-# -------------------- fen elements incorrect (tests 2: total 17) -------------
+# -------------------- test of extra white spaces -----------------------------
+
+def test_fenWhiteSpaceBetween Elements():
+    test = Fen(fen = ' rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR  w     KQkq d6 0  3')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+# -----------------------------------------------------------   1 test: total 21
+
+# -------------------- fen elements incorrect -------------
 
 def test_toPlayError():
     with mock.patch('builtins.input',side_effect = ['w']):
