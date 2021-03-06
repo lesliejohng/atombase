@@ -493,6 +493,8 @@ class Fen():
             augmentedRank = Fore.GREEN+'  ' + str(rankCount) + '   '+Style.RESET_ALL
         return augmentedBoard
 
+# board searching
+
     def squareToFenPosition(self,square):
         if square in self.validSquares:
             return self.validSquares.index(square)
@@ -503,6 +505,8 @@ class Fen():
         if boardString == '':
             boardString = self.board
         return boardString[self.squareToFenPosition(targetSquare)]
+
+# fen reconstruction
 
     def fenReconstruct(self):
         # this will recompile the elements into a valid fen
@@ -516,12 +520,3 @@ class Fen():
 
 
 # initial test
-
-# display given vaules
-test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-# value not given
-x = test.boardToArray()
-test.displayBoard(x)
-str(x)
-y = test.augmentBoard(x)
-test.displayBoard(y)

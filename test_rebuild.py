@@ -4,8 +4,6 @@ import mock
 
 startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
-# manual count of tests = 24
-
 # -------------------- Fixtures -----------------------------------------------
 
 @pytest.fixture
@@ -39,7 +37,7 @@ def good_ep_fen():
 
 # -----------------------------------------------------------------------------
 
-# -------------------- tests: non-string fen (4 tests: total 4) ---------------
+# -------------------- tests: non-string fen ----------------------------------
 
 def test_missingFen():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
@@ -98,9 +96,9 @@ def test_nonStringFenBool():
         assert test.move == '1'
         assert str(test) == startingFen
 
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------ 4 tests: total 4
 
-# -------------------- test sub-string assumptions (test 1 total 5) -----------
+# -------------------- test sub-string assumptions ----------------------------
 
 def test_noBoardSubstring():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']):
@@ -118,9 +116,60 @@ def test_noBoardSubstring():
         assert test.move == '20'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 5 20'
 
-# -------------------- fen passed with missing elements (tests 1: total 6) ----
+def test_singleDigit():
+        # the available digit should be taken as the move number
+        # half move will be reset to o
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '2'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 2'
 
-def test_insufficientFen():
+def test_NoDigit():
+        # the available digit should be taken as the move number
+        # half move will be reset to 0, move to 1
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '1'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1'
+
+def test_MisplacedDigitsboth():
+        # misplaced digits will be reset
+        # half move will be reset to 0, move to 1
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w 1 2 KQkq -')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '1'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1'
+
+def test_MisplacedDigitsOne():
+        # misplaced digits will be reset
+        # half move will be reset to 0
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w 1 KQkq - 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        # the last digit is assumed to be the move counter
+        assert test.move == '2'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 2'
+
+# ------------------------------------------------------------ 5 tests: total 9
+
+# -------------------- fen passed with missing elements -----------------------
+
+def test_FenBoardOnly():
     with mock.patch('builtins.input',side_effect = ['w','KQkq','-']):
         test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq 1 2')
         # reset all but board and halfMove/move, as missing element
@@ -133,7 +182,69 @@ def test_insufficientFen():
         assert test.move == '2'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
 
-# -------------------- test allocation of '-' (tests 5: total 11) -------------
+def test_fenMissingBoard():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen(fen = 'w KQkq - 1 2')
+        # reset all but board and halfMove/move, as missing element
+        # requires input of all other elements of the fen
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
+
+def test_fenMissingToPlay():
+    with mock.patch('builtins.input',side_effect = ['w']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR KQkq d6 0 3')
+        # the missing toPlay would make it impossible to check ep,
+        # but toPlay should be set in time to prevent  problem
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenMissingCastling():
+    with mock.patch('builtins.input',side_effect = ['KQkq']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w d6 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenMissingEP():
+    with mock.patch('builtins.input',side_effect = ['d6']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenMissingDigit():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 3')
+    # assumed that the provided digit is the move number
+    # half move will be reset to 0
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+# ----------------------------------------------------------- 5 tests: total 14
+
+# -------------------- test allocation of '-' (tests 5: total 15) -------------
 
 def test_ep_None():
     test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
@@ -182,7 +293,7 @@ def test_2Blanks_ep_None():
 
 # ------------------------------------------------------------------
 
-# -------------------- fen elements incorrect (tests 2: total 13) -------------
+# -------------------- fen elements incorrect (tests 2: total 17) -------------
 
 def test_toPlayError():
     with mock.patch('builtins.input',side_effect = ['w']):
@@ -208,7 +319,7 @@ def test_CastlingError():
 
 # -----------------------------------------------------------------------------
 
-# -------------------- ep invalid squares (tests 5: total 18) -----------------
+# -------------------- ep invalid squares (tests 5: total 22) -----------------
 
 def test_epInvalidSquare():
     with mock.patch('builtins.input',side_effect = ['-']):
@@ -263,7 +374,7 @@ def test_epbtpInvalid():
 
 # -----------------------------------------------------------------------------
 
-# -------------------- fen elements out of order (tests 1: total 19) ----------
+# -------------------- fen elements out of order (tests 1: total 23) ----------
 # valid toPlay, castling and ep should be recognised
 
 def test_orderFenValidEP():
@@ -276,7 +387,7 @@ def test_orderFenValidEP():
     assert test.move == '3'
     assert str(test) == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-# ------------------- board errors: kings (tests 4 : total 23)-----------------
+# ------------------- board errors: kings (tests 4 : total 27)-----------------
 
 def test_noWhiteKing():
     # this checks that the absence of a white king results in an error
@@ -323,7 +434,7 @@ def test_manyBlackKings():
         assert test.halfMove == '1'
         assert test.move == '2'
 
-# -------------------- test board display (2 test: total 25) ------------------
+# -------------------- test board display (2 test: total 29) ------------------
 
 def test_boardDisplay():
     test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
