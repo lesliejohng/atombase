@@ -395,3 +395,10 @@ added pytest for white space between elements, leading shite space and
 trailing white space
 
 added pytest for white space within board
+
+added pytest for white space within castling: problem issue not being handled
+as I expected: thought this would force input, but last section of element
+was set.
+
+This occurred because I removed the contradictory element checks.
+ACTION: add them back!

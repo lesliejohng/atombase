@@ -33,6 +33,7 @@ class Fen():
                             'a3','b3','c3','d3','e3','f3','g3','h3']
         self.validEPwtp = ['-','a6','b6','c6','d6','e6','f6','g6','h6']
         self.validEPbtp = ['-','a3','b3','c3','d3','e3','f3','g3','h3']
+        self.validEP = self.validEPwtp + self.validEPbtp
         # C) board
         self.validBoardCharacters = '12345678/kqrnbpKQRBNP'
         self.validSquares = ('a8','b8','c8','d8','e8','f8','g8','h8',
@@ -76,13 +77,16 @@ class Fen():
         for element in self.fenElements:
             # does element look like a ToPlay element?
             if len(element) == 1 and element in 'wb':
-                self.toPlay = element
+                self.toPlay = self.checkContradiction(existing = self.toPlay,
+                                                            new = element)
             # does element look like a castling element?
             elif element in self.recognisedCastling:
-                self.castling = element
+                self.castling = self.checkContradiction(existing = self.castling,
+                                                    new = element)
             # does element look like a ep element?
             elif element in self.recognisedEP:
-                self.ep = element
+                self.ep = self.checkContradiction(existing = self.ep,
+                                                new = element)
 
         countBlank = self.fenElements.count('-')
 
@@ -110,25 +114,26 @@ class Fen():
 
         self.board = self.checkBoard(board = self.fenElements[0])
 
-        if self.toPlay != '?': # toPlay element recognised in fen
-            self.toPlay = self.checkToPlay(toPlay = self.toPlay)
-        else:
+        if len(self.toPlay) == 1 and self.toPlay in 'wb':
+            pass # no change required
+        elif self.toPlay == '?' or self.toPlay == '??':
             self.toPlay = self.checkToPlay(toPlay = '?')
-
-        if self.castling != '?': #castling element recognised in fen
-            self.castling = self.checkCastling(castling = self.castling, board = self.board)
-        elif self.elementCount > 2:
-            # this will pick up '-' (no castling rights)
-            self.castling = self.checkCastling(castling = self.fenElements[3], board = self.board)
         else:
+            self.toPlay = self.checkToPlay(toPlay = self.toPlay)
+
+        if self.castling in self.validCastling:
+            pass #no change required
+        elif self.castling == '?' or self.castling == '??':
             self.castling = self.checkCastling(castling = '?', board = self.board)
-
-        if self.ep != '?': # ep element recognised
-            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay)
-        elif self.elementCount > 3:
-            self.ep = self.checkEP(ep = self.fenElements[3], toPlay = self.toPlay)
         else:
+            self.castling = self.checkCastling(castling = self.castling, board = self.board)
+
+        if self.ep in self.validEP:
+            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay)
+        elif self.ep == '?' or self.ep == '??':
             self.ep = self.checkEP(ep = '?', toPlay = self.toPlay)
+        else:
+            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay)
 
         # if penultimate item on list is a digit
         # take this as the halfMove
@@ -161,13 +166,25 @@ class Fen():
 
     # This section is for routines which check fenElements
 
+    def checkContradiction(self, existing, new):
+        if existing == '?': #value unset
+            return new
+        elif existing == '??':
+            # contradictory elements in fen
+            return existing # leave '??' caution
+        else: # check for contradictions
+            if  existing == new:
+                # make no change to existing value
+                return existing
+            else: #contradictory elements in fen
+                return '??'
+        print('Warning! checkContradiction. This should never print!')
 
     def checkBoard(self, board):
         # this is a series of tests on the board to see if it valid
         newBoard = ''
         # to force while loop to run
         self.errors.append('first time flag')
-
 
         while not self.errors == []:
 
@@ -237,15 +254,14 @@ class Fen():
     def checkToPlay(self, toPlay):
 
         if toPlay == 'w' or toPlay == 'b':
-            newToPlay = toPlay
+            return toPlay
         else:
             message = WarningMsg(header = 'Error in To Play element of fen',
                     body = str(toPlay)+' input is not valid',
                     instruction = 'should be either "w" or "b". Please re-input.')
             message
-            newToPlay = self.inputToPlay()
+            return self.inputToPlay()
 
-        return newToPlay
 
     def checkCastling(self, castling, board):
 
@@ -288,27 +304,29 @@ class Fen():
 
     def checkEP(self, ep, toPlay):
 
-        if not ep == '-':
+        if ep == '-':
+            return ep
+        elif ep in self.validEP:
             if toPlay == 'w':
                 if ep in self.validEPwtp:
-                    newEP = ep
+                    return ep
                 else:
                     message = WarningMsg(header = 'EP square: ' + str(ep),
                             body = 'The EP square is not valid in a "white to play" position')
                     message
-                    newEP = self.inputEP(toPlay  = 'w')
-            elif toPlay == 'b':
+                    return self.inputEP(toPlay  = 'w')
+            else:
                 if ep in self.validEPbtp:
-                    newEP = ep
+                    return ep
                 else:
                     message = WarningMsg(header = 'EP square' + str(ep),
                             body = 'The EP square is not valid in a "black to play" position')
                     message
-                    newEP = self.inputEP(toPlay = 'b')
+                    return self.inputEP(toPlay = 'b')
         else:
-            newEP = ep
+            return self.inputEP(toPlay = toPlay)
 
-        return newEP
+        print('warning! This message should never print.')
 
     # this section is for input routines which return a corrected value
     # these are static methods to allow mock input testing in pytest
@@ -521,3 +539,11 @@ class Fen():
 
 
 # initial test
+def main():
+    print('starting direct tests\n')
+    test=Fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e6 0 1')
+    print('should be starting position with e6 as a epsquare: ')
+    print(test.board, test.toPlay, test.castling, test.ep, test.halfMove, test.move)
+
+if __name__ == '__main__' :
+    main()
