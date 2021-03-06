@@ -386,3 +386,10 @@ added pytest for blank elements
 added pytest for invalid ep elements
 
 added pytest re board display
+
+6/3/21
+
+added pytest for missing Elements
+
+added pytest for white space between elements, leading shite space and
+trailing white space

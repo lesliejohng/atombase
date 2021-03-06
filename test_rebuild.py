@@ -295,8 +295,28 @@ def test_2Blanks_ep_None():
 
 # -------------------- test of extra white spaces -----------------------------
 
-def test_fenWhiteSpaceBetween Elements():
-    test = Fen(fen = ' rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR  w     KQkq d6 0  3')
+def test_fenWhiteSpaceBetweenElements():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR  w     KQkq d6 0  3')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenLeadingWhiteSapce():
+    test = Fen(fen = '        rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0  3')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenTrailingWhiteSpace():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR  w KQkq d6 0 3     ')
     assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
     assert test.toPlay == 'w'
     assert test.castling == 'KQkq'
@@ -307,7 +327,7 @@ def test_fenWhiteSpaceBetween Elements():
 
 # -----------------------------------------------------------   1 test: total 21
 
-# -------------------- fen elements incorrect -------------
+# -------------------- fen elements incorrect ---------------------------------
 
 def test_toPlayError():
     with mock.patch('builtins.input',side_effect = ['w']):
@@ -324,6 +344,16 @@ def test_CastlingError():
         # as the castling element is unrecognisable, '-'
         # cannot be allocated, so ep needs to be set
         test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_epError():
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq x 1 2')
         assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
         assert test.toPlay == 'b'
         assert test.castling == 'KQkq'

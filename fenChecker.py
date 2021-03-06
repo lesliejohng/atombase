@@ -48,6 +48,7 @@ class Fen():
 
         # processing of the fen starts here
         fen = str(fen) # forcing fen argument to a string
+        fen = fen.strip() #stripping leading/trailing white space
 
         # splitting fen into sub-strings
         self.fen = fen
