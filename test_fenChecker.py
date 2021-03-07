@@ -4,129 +4,247 @@ import mock
 
 startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
+# -------------------- Fixtures -----------------------------------------------
+
 @pytest.fixture
 def good_fen():
     # sets up a Fen object with a valid fen
-    return Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    # postion after 1 e4 e5 2 Nf3
+    return Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
 
 @pytest.fixture
 def good_ep_fen():
     # sets up a Fen object with a valid test.ep square
-    return Fen('rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R # BUG:  KQkq e3 1 2')
+    # NB I am currently not clear whether this should be set ONLY if there is
+    # an enemy pawn positioned to perform a ep capture. ie only when it matters!
+    # The following position is after 1 e4 e6 2 e5 d5 when white could play
+    # 3 exd6 e.p.
+    return Fen('rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3')
+
+# -----------------------------------------------------------------------------
+
+# -------------------- assumptions --------------------------------------------
+
+# In handling a string input I have made the following assumptions
+#       1) the first sub-string is always the board
+#       2) the last sub-string is always the move counter IF A DIGIT and fen
+#          has more at least 2 elements
+#       3) the penultimate sub-string is always the half move clock IF A DIGIT
+#          AND the last sub-string is ALSO A DIGIT and the fen has as least
+#          3 elements
+#       4) if a toPlay, castling or ep element is recognised
+#          anywhere in the fen that value will be saved
+
+# -----------------------------------------------------------------------------
+
+# -------------------- tests: non-string fen ----------------------------------
 
 def test_missingFen():
     with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
-                            'w','KQkq','-','0','1']):# full reset to starting position
+                            'w','KQkq','-']): # full reset to starting position
+        # currently this is not an automatic reset to the starting position
+        # as in pychess, but requires manual input of each element
+        # of the fen
+        test = Fen() # nothing passed
         assert test.board == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
         assert test.toPlay == 'w'
         assert test.castling == 'KQkq'
         assert test.ep == '-'
         assert test.halfMove == '0'
         assert test.move == '1'
-        assert test == startingFen
+        assert str(test) == startingFen
 
-def test_nonStringFen():
-    test = Fen( fen=5)
-    # full reset to starting position
-    # this is achieved withing the class Fen, so requires a full List
-    # of tested elements
-    assert test.board == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
-    # fenToPlay set to test default 'w'
+def test_nonStringFenInteger():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
+                            'w','KQkq','-']): # reset to starting position
+        test = Fen(fen = 5) # integer passed
+        # 5 is a valid fen character, so the board element consists of 5
+        # blank squares
+        assert test.board == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '1'
+        assert str(test) == startingFen
+
+def test_nonStringFenFloat():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
+                            'w','KQkq','-']): # reset to starting position
+        test = Fen(fen = 5.45) # float passed
+        # 5.45 could be read as a board with 10 squares and one invalid
+        # character ('.')
+        assert test.board == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '1'
+        assert str(test) == startingFen
+
+def test_nonStringFenBool():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
+                            'w','KQkq','-']): # full reset to starting position
+        test = Fen(True) # bool passed
+        # 5 is a valid fen character, so the board element consists of 5
+        # blank squares
+        assert test.board == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '1'
+        assert str(test) == startingFen
+
+# ------------------------------------------------------------ 4 tests: total 4
+
+# -------------------- test sub-string assumptions ----------------------------
+
+def test_noBoardSubstring():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen(fen = 'w KQkq - 5 20')
+        # toPlay, castling and ep should be recognised
+        # no board element passed
+        # last two items accepted as they are digits
+        assert test.fenElements == ['w', 'KQkq', '-', '5', '20']
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        # fenToPlay set to test default 'w'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '5'
+        assert test.move == '20'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 5 20'
+
+def test_singleDigit():
+        # the available digit should be taken as the move number
+        # half move will be reset to o
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '2'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 2'
+
+def test_NoDigit():
+        # the available digit should be taken as the move number
+        # half move will be reset to 0, move to 1
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '1'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1'
+
+def test_MisplacedDigitsboth():
+        # misplaced digits will be reset
+        # half move will be reset to 0, move to 1
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w 1 2 KQkq -')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        assert test.move == '1'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1'
+
+def test_MisplacedDigitsOne():
+        # misplaced digits will be reset
+        # half move will be reset to 0
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w 1 KQkq - 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '0'
+        # the last digit is assumed to be the move counter
+        assert test.move == '2'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 2'
+
+# ------------------------------------------------------------ 5 tests: total 9
+
+# -------------------- fen passed with missing elements -----------------------
+
+def test_FenBoardOnly():
+    with mock.patch('builtins.input',side_effect = ['w','KQkq','-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq 1 2')
+        # reset all but board and halfMove/move, as missing element
+        # requires input of all other elements of the fen
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
+
+def test_fenMissingBoard():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen(fen = 'w KQkq - 1 2')
+        # reset all but board and halfMove/move, as missing element
+        # requires input of all other elements of the fen
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
+
+def test_fenMissingToPlay():
+    with mock.patch('builtins.input',side_effect = ['w']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR KQkq d6 0 3')
+        # the missing toPlay would make it impossible to check ep,
+        # but toPlay should be set in time to prevent  problem
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenMissingCastling():
+    with mock.patch('builtins.input',side_effect = ['KQkq']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w d6 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenMissingEP():
+    with mock.patch('builtins.input',side_effect = ['d6']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenMissingDigit():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 3')
+    # assumed that the provided digit is the move number
+    # half move will be reset to 0
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
     assert test.toPlay == 'w'
     assert test.castling == 'KQkq'
-    assert test.ep == '-'
+    assert test.ep == 'd6'
     assert test.halfMove == '0'
-    assert test.move == '1'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-def test_insufficientFen():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq - 1 2')
-    # reset all but board, as missing element requires input of all
-    # other elements of the fen
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    # fenToPlay set to test default 'w'
-    assert test.toPlay == 'w'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '0'
-    assert test.move == '1'
+# ----------------------------------------------------------- 6 tests: total 15
 
-def test_invalidCharInBoard():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2x5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-    # temporary: reset board to starting position
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
-
-def test_noWhiteKing():
-    # this checks that the absence of a white king results in an error
-    test = Fen(fen ='rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
-    # temporary: reset board to starting position
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R'
-    assert test.toPlay == 'b'
-    # no white king
-    assert test.castling == 'kq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
-
-def test_manyWhiteKings():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKK1R b KQkq - 1 2')
-    # temporary: reset board to starting position
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKK1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
-
-def test_noBlackKing():
-    test = Fen(fen = 'rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-    # temporary: reset board to starting position
-    assert test.board == 'rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    #no black king
-    assert test.castling == 'KQ'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
-
-def test_manyBlackKings():
-    test = Fen(fen = 'rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-    # temporary: reset board to starting position
-    assert test.board == 'rnbqkknr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
-
-def test_toPlayError():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R z KQkq - 1 2')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    # fenToPlay set to test default 'w'
-    assert test.toPlay == 'w'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
-    caseWhite = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2'
-    caseBlack = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2'
-    assert test.fenReconstruct() == caseWhite
-    test.fenElementDict['fenToPlay'] = 'b'
-    assert test.fenReconstruct() == caseBlack
-
-def test_CastlingError():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    # temporary: reset fenCastling to 'KQkq'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
+# -------------------- test allocation of '-' ---------------------------------
 
 def test_ep_None():
     test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
@@ -137,28 +255,141 @@ def test_ep_None():
     assert test.halfMove == '1'
     assert test.move == '2'
 
-def test_toPlay_NoToPlayElement():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R - KQkq e6 1 2')
+def test_castling_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - e3 1 2')
     assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    # fenToPlay reset to test default 'w'
-    assert test.toPlay == 'w'
-    assert test.castling == 'KQkq'
-    # as fenToPlay reset to 'w', e6 is valid
-    assert test.ep == 'e6'
+    assert test.toPlay == 'b'
+    assert test.castling == '-'
+    assert test.ep == 'e3'
     assert test.halfMove == '1'
     assert test.move == '2'
 
-def test_test.epInvalidSquare():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e5 1 2')
+def test_castling_ep_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - - 1 2')
     assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    # temporary: reset fentest.ep to '-'
+    assert test.castling == '-'
     assert test.ep == '-'
     assert test.halfMove == '1'
     assert test.move == '2'
 
-def test_test.epwtpValid():
+def test_2Blanks_castling_set():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - - KQkq 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == 'KQkq'
+    assert test.ep == '-'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+def test_2Blanks_ep_None():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b - -  e3 1 2')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+    assert test.toPlay == 'b'
+    assert test.castling == '-'
+    assert test.ep == 'e3'
+    assert test.halfMove == '1'
+    assert test.move == '2'
+
+# ----------------------------------------------------------- 5 tests: total 20
+
+# -------------------- test of extra white spaces -----------------------------
+
+def test_fenWhiteSpaceBetweenElements():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR  w     KQkq d6 0  3')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenLeadingWhiteSapce():
+    test = Fen(fen = '        rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0  3')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenTrailingWhiteSpace():
+    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR  w KQkq d6 0 3     ')
+    assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
+    assert test.castling == 'KQkq'
+    assert test.ep == 'd6'
+    assert test.halfMove == '0'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenWhiteSpaceInCastling():
+    with mock.patch('builtins.input',side_effect = ['KQkq']):
+        # problem this would result in two valid castling elements
+        # should be caught as contradictory and require input of castling
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQ kq d6 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+# -----------------------------------------------------------   1 test: total 21
+
+# -------------------- fen elements incorrect ---------------------------------
+
+def test_toPlayError():
+    with mock.patch('builtins.input',side_effect = ['w']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R z KQkq - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_CastlingError():
+    with mock.patch('builtins.input',side_effect = ['KQkq', '-']):
+        # as the castling element is unrecognisable, '-'
+        # cannot be allocated, so ep needs to be set
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkx - 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_epError():
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq x 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+# -----------------------------------------------------------------------------
+
+# -------------------- ep invalid squares (tests 5: total 22) -----------------
+
+def test_epInvalidSquare():
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e5 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        # manual reset ep to '-'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
+
+def test_epwtpValid():
     test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e6 1 2')
     assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.toPlay == 'w'
@@ -169,7 +400,6 @@ def test_test.epwtpValid():
 
 def test_epbtpValid():
     test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e3 1 2')
-    assert test.fenElementDict.get('fenBoard', 'unknown') != 'unknown'
     assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
     assert test.toPlay == 'b'
     assert test.castling == 'KQkq'
@@ -178,114 +408,136 @@ def test_epbtpValid():
     assert test.move == '2'
 
 def test_epwtpInvalid():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'w'
-    assert test.castling == 'KQkq'
-    # temporary: reset fentest.ep to '-'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq e3 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        # temporary: reset fentest.ep to '-'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
 
 def test_epbtpInvalid():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    # temporary: reset fentest.ep to '-'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
+    with mock.patch('builtins.input',side_effect = ['-']):
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq e6 1 2')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        # ep reset to '-'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
 
-def test_validtest.halfMove():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 5')
-    # test.halfMove is a digit, so no test
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '3'
-    assert test.move == '5'
+# -----------------------------------------------------------------------------
 
-def test_invalidtest.halfMove():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - x 5')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
+# -------------------- fen elements out of order (tests 1: total 23) ----------
+# valid toPlay, castling and ep should be recognised
+
+def test_orderFenValidEP():
+    test = Fen(fen = 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR d6 w KQkq 0 3')
+    assert test.board == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR'
+    assert test.toPlay == 'w'
     assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    # reset half move to 0
+    assert test.ep == 'd6'
     assert test.halfMove == '0'
-    assert test.move == '5'
+    assert test.move == '3'
+    assert str(test) == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-def test_validMoveCount():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-    # move is a digit so there is no test
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
+# ------------------- board errors: kings (tests 4 : total 27)-----------------
 
-def test_invalidMoveCount():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 x')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    # reset fenMoveCounter to '1'
-    assert test.move == '1'
+def test_noWhiteKing():
+    # this checks that the absence of a white king results in an error
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+        # input fo corrected board element
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
 
-def test_noError():
-    test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
-    assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert test.toPlay == 'b'
-    assert test.castling == 'KQkq'
-    assert test.ep == '-'
-    assert test.halfMove == '1'
-    assert test.move == '2'
+def test_manyWhiteKings():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBKKB1R b KQkq - 1 2')
+        # input fo corrected board element
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
 
-def test_fenElements(good_fen):
-    assert len(good_fen.fenElements) == 6
-    assert good_fen.board ==  'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert good_fen.toPlay == 'b'
-    assert good_fen.castling == 'KQkq'
-    assert good_fen.fenElementDict.get('fentest.ep') == '-'
-    assert good_fen.fenElementDict.get('fentest.eptest.halfMove') == '1'
-    assert good_fen.fenElementDict.get('fenMove') == '2'
+def test_noBlackKing():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbqqbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+        # input fo corrected board element
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
 
-def test_fenElements(good_test.ep_fen):
-    assert len(good_test.ep_fen.fenElements) == 6
-    assert good_test.ep_fen.board ==  'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R'
-    assert good_test.ep_fen.toPlay == 'b'
-    assert good_test.ep_fen.castling == 'KQkq'
-    assert good_test.ep_fen.fenElementDict.get('fentest.ep') == 'e3'
-    assert good_test.ep_fen.fenElementDict.get('fentest.halfMove') == '1'
-    assert good_test.ep_fen.fenElementDict.get('fenMove') == '2'
+def test_manyBlackKings():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq']): # full reset to starting position
+        test = Fen(fen = 'rnbkkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQQB1R b KQkq - 1 2')
+        # input fo corrected board element
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R KQkq'
+        assert test.toPlay == 'b'
+        assert test.castling == 'KQkq'
+        assert test.ep == '-'
+        assert test.halfMove == '1'
+        assert test.move == '2'
 
-def test_goodBoardDiaplay(good_fen):
-    x = good_fen.board
-    y = good_fen.boardToArray(x)
-    z = good_fen.augmentBoard(y)
-    assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n', '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '  .   .   .   .   .   .   .   .   \n', '  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '  .   .   .   .   P   .   .   .   \n', '  .   .   .   .   .   N   .   .   \n', '  P   P   P   P   .   P   P   P   \n', '  R   N   B   Q   K   B   .   R   \n']
-    assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m', '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n', '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n', '\x1b[32m  5   \x1b[0m  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n', '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n', '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n', '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
+# -------------------- test board display (2 test: total 29) ------------------
 
-def test_boardDisplayBadChar():
-    test = Fen()
-    y = test.boardToArray('rnbqkbxr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R')
-    z = test.augmentBoard(y)
-    assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m?   \x1b[31mr   \x1b[0m\n', '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '  .   .   .   .   .   .   .   .   \n', '  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '  .   .   .   .   P   .   .   .   \n', '  .   .   .   .   .   N   .   .   \n', '  P   P   P   P   .   P   P   P   \n', '  R   N   B   Q   K   B   .   R   \n']
-    assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m', '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m?   \x1b[31mr   \x1b[0m\n', '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n', '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n', '\x1b[32m  5   \x1b[0m  .   .   \x1b[31mp   \x1b[0m.   .   .   .   .   \n', '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n', '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n', '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n', '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
+def test_boardDisplay():
+    test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    y = test.boardToArray('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R')
+    assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+        '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+        '  .   .   .   .   .   .   .   .   \n',
+        '  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+        '  .   .   .   .   P   .   .   .   \n',
+        '  .   .   .   .   .   N   .   .   \n',
+        '  P   P   P   P   .   P   P   P   \n',
+        '  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard(y)
+    z = test.augmentBoard()
+    assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m',
+    '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+    '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+    '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n',
+    '\x1b[32m  5   \x1b[0m  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+    '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n',
+    '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n',
+    '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n',
+    '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard(z)
 
-def test_toPlayInputw():
-    with mock.patch('builtins.input',return_value = "w"):
-        assert Fen.toPlayInput() == "w"
-
-def test_toPlayInputb():
-    with mock.patch('builtins.input',return_value = "b"):
-        assert Fen.toPlayInput() == "b"
-
-def test_toPlayIncorrectInput():
-    with mock.patch('builtins.input',side_effect = ["K","w"]):
-        assert Fen.toPlayInput() == "w"
+def test_boardDisplayNotExplicit():
+    test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+    y = test.boardToArray('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R')
+    assert y == ['  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+        '  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+        '  .   .   .   .   .   .   .   .   \n',
+        '  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+        '  .   .   .   .   P   .   .   .   \n',
+        '  .   .   .   .   .   N   .   .   \n',
+        '  P   P   P   P   .   P   P   P   \n',
+        '  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard()
+    z = test.augmentBoard()
+    assert z == ['\x1b[32m\n        a   b   c   d   e   f   g   h  \n\x1b[0m',
+    '\x1b[32m  8   \x1b[0m  \x1b[31mr   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mq   \x1b[0m\x1b[31mk   \x1b[0m\x1b[31mb   \x1b[0m\x1b[31mn   \x1b[0m\x1b[31mr   \x1b[0m\n',
+    '\x1b[32m  7   \x1b[0m  \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m.   \x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\x1b[31mp   \x1b[0m\n',
+    '\x1b[32m  6   \x1b[0m  .   .   .   .   .   .   .   .   \n',
+    '\x1b[32m  5   \x1b[0m  .   .   .   .   \x1b[31mp   \x1b[0m.   .   .   \n',
+    '\x1b[32m  4   \x1b[0m  .   .   .   .   P   .   .   .   \n',
+    '\x1b[32m  3   \x1b[0m  .   .   .   .   .   N   .   .   \n',
+    '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n',
+    '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
+    test.displayBoard()
+# -----------------------------------------------------------------------------
