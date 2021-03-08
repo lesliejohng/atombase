@@ -21,6 +21,14 @@ def good_ep_fen():
     # 3 exd6 e.p.
     return Fen('rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3')
 
+@pytest.fixture
+def castling_fen():
+    # in this position it is not clear whether or not the Kings or Rooks
+    # have moved as each Rook could have moved and moved back and the kings
+    # could have moved and directly moved back or taken a triangluar
+    # route back to their original square.
+    return Fen('r1bqkb1r/ppp2ppp/2np1n2/4p3/4P3/2NP1N2/PPP2PPP/R1BQKB1R')
+    # toPlay, castling and ep will need to be set
 # -----------------------------------------------------------------------------
 
 # -------------------- assumptions --------------------------------------------
@@ -338,7 +346,33 @@ def test_fenWhiteSpaceInCastling():
         assert test.move == '3'
         assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-# -----------------------------------------------------------   1 test: total 21
+def test_fenWhiteSpaceInEP():
+    with mock.patch('builtins.input',side_effect = ['d6']):
+        # problem this would result in two valid castling elements
+        # should be caught as contradictory and require input of castling
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d 6 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+def test_fenWhiteSpaceInCandEP():
+    with mock.patch('builtins.input',side_effect = ['KQkq', 'd6']):
+        # problem this would result in two valid castling elements
+        # should be caught as contradictory and require input of castling
+        test = Fen(fen = 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w K Qkq d 6 0 3')
+        assert test.board == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR'
+        assert test.toPlay == 'w'
+        assert test.castling == 'KQkq'
+        assert test.ep == 'd6'
+        assert test.halfMove == '0'
+        assert test.move == '3'
+        assert str(test) == 'rnbqkbnr/pp1ppppp/8/8/3Pp3/4p3/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
+
+# -----------------------------------------------------------  6 test: total 26
 
 # -------------------- fen elements incorrect ---------------------------------
 
@@ -374,9 +408,9 @@ def test_epError():
         assert test.halfMove == '1'
         assert test.move == '2'
 
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------- 3 tests: total 29
 
-# -------------------- ep invalid squares (tests 5: total 22) -----------------
+# -------------------- ep invalid squares -------------------------------------
 
 def test_epInvalidSquare():
     with mock.patch('builtins.input',side_effect = ['-']):
@@ -429,9 +463,9 @@ def test_epbtpInvalid():
         assert test.halfMove == '1'
         assert test.move == '2'
 
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------- 5 tests: total 34
 
-# -------------------- fen elements out of order (tests 1: total 23) ----------
+# -------------------- fen elements out of order ------------------- ----------
 # valid toPlay, castling and ep should be recognised
 
 def test_orderFenValidEP():
@@ -444,7 +478,9 @@ def test_orderFenValidEP():
     assert test.move == '3'
     assert str(test) == 'rnbqkbnr/pppp1ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-# ------------------- board errors: kings (tests 4 : total 27)-----------------
+# ------------------------------------------------------------ 1 test: total 35
+
+# ------------------- board errors: kings -------------------------------------
 
 def test_noWhiteKing():
     # this checks that the absence of a white king results in an error
@@ -491,7 +527,125 @@ def test_manyBlackKings():
         assert test.halfMove == '1'
         assert test.move == '2'
 
-# -------------------- test board display (2 test: total 29) ------------------
+# ----------------------------------------------------------- 4 tests: total 39
+
+# -------------------- castling: Board incorrect ------------------------------
+
+def test_castling_KQkq_Passed(good_fen):
+    test = Fen(good_fen)
+    assert test.castling == 'KQkq'
+
+def test_KQkq_Wht_K_Moved():
+    test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1B1R w KQkq - 2 2')
+    # after 1 e4 e5 2 Ke2
+    # system should change castling automatically to 'kq'
+    assert test.castling == 'kq'
+
+def test_KQkq_Blk_K_Moved():
+    test = Fen('rnbq1bnr/ppppkppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3')
+    # after 1e4 e5 2 Nf3 Ke7
+    # system should change castling automatically to 'KQ'
+    assert test.castling == 'KQ'
+
+def test_KQkq_Wht_KR_Moved():
+    test = Fen('r1bqkbnr/pppp1ppp/2N5/4p3/4P3/8/PPPP1PPP/RNBQKBR1 w KQkq - 3 3')
+    # after 1 e4 e5 2 Nf3 Nc6 3 Rg1
+    # system should change castling automatically to 'Qkq'
+    assert test.castling == 'Qkq'
+
+def test_KQkq_Blk_KR_Moved():
+    test = Fen('rnbqkbr1/pppp1ppp/5N2/4P3/4P3/2N2N2/PPPP1PPP/RNBQKB1R w KQkq - 4 4')
+    # after 1 e4 e5 2 Nf3 Nf6 3 Nc3 Rg8
+    # system should change castling automatically to 'KQq'
+    assert test.castling == 'KQq'
+
+def test_KQkq_Both_KR_Moved():
+    test = Fen('rnbqkbr1/pppp1ppp/5N2/4P3/4P3/5N2/PPPP1PPP/RNBQKBR1 w KQkq - 4 4')
+    # after 1 e4 e5 2 Nf3 Nf6 3 Rg1 Rg8
+    # system should change castling automatically to 'Qq'
+    assert test.castling == 'Qq'
+
+def test_KQkq_Wht_QR_Moved():
+    test = Fen('r1bqkbnr/pppppppp/2N5/8/8/2N5/PPPPPPPP/1RBQKBNR b KQkq - 3 2')
+    # after 1 Nc3 Nc6 2 Rb1
+    # system should change castling automatically to 'Kkq'
+    assert test.castling == 'Kkq'
+
+def test_KQkq_Blk_QR_Moved():
+    test = Fen('1rbqkbnr/pppppppp/2N5/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 3')
+    # after 1 Nc3 Nc6 2 e4 Rb8
+    # system should change castling automatically to 'KQk'
+    assert test.castling == 'KQk'
+
+def test_KQkq_Both_QR_Moved():
+    test = Fen('1rbqkbnr/pppppppp/2N5/8/8/2N5/PPPPPPPP/1RBQKBNR b KQkq - 1 3')
+    # after 1 Nc3 Nc6 2 Rb1 Rb8
+    # system should change castling automatically to 'Kk'
+    assert test.castling == 'Kk'
+
+def test_KQk_Passed_position_unclear(): # Blk Rook moved and moved back
+    test = Fen('r1bqkb1r/ppp2ppp/2np1n2/4p3/4P3/2NP1N2/PPP2PPP/R1BQKB1R w KQk -')
+        # in this position it is not clear whether or not the Kings or Rooks
+        # have moved as each Rook could have moved and moved back and the kings
+        # could have moved and directly moved back or taken a triangluar
+        # route back to their original square.
+    assert test.castling == 'KQk'
+        # program accepts input
+
+#random selection of other possibilities
+
+def test_KQq_Wht_K_Moved():
+    test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1B1R w KQq - 2 2')
+    # after 1 e4 e5 2 Ke2
+    # system should change castling automatically to 'q' as passed value implies
+    # q-side castling still Ok, but not so given Wnt K position
+    assert test.castling == 'q'
+
+def test_KQq_Wht_KR_Moved():
+    test = Fen('r1bqkbnr/pppp1ppp/2N5/4p3/4P3/8/PPPP1PPP/RNBQKBR1 w KQq - 3 3')
+    # after 1 e4 e5 2 Nf3 Nc6 3 Rg1
+    # accepting the implied input that Blk KR moved and moved back the system
+    # should change castling automatically to 'Qq'
+    assert test.castling == 'Qq'
+
+def test_KQk_Blk_K_Moved():
+    test = Fen('rnbq1bnr/ppppkppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQk - 2 3')
+    # after 1e4 e5 2 Nf3 Ke7
+    # system should change agree to passed value 'KQ'
+    assert test.castling == 'KQ'
+
+def test_KQ_Blk_KR_Moved():
+    test = Fen('rnbqkbr1/pppp1ppp/5N2/4P3/4P3/2N2N2/PPPP1PPP/RNBQKB1R w KQ - 4 4')
+    # after 1 e4 e5 2 Nf3 Nf6 3 Nc3 Rg8
+    # system should change castling automatically to 'Q'
+    assert test.castling == 'KQ'
+
+def test_Kkq_Both_KR_Moved():
+    test = Fen('rnbqkbr1/pppp1ppp/5N2/4P3/4P3/5N2/PPPP1PPP/RNBQKBR1 w Kkq - 4 4')
+    # after 1 e4 e5 2 Nf3 Nf6 3 Rg1 Rg8
+    # system should change castling automatically to 'Qq'
+    assert test.castling == 'q'
+
+def test_Qkq_Wht_QR_Moved():
+    test = Fen('r1bqkbnr/pppppppp/2N5/8/8/2N5/PPPPPPPP/1RBQKBNR b Qkq - 3 2')
+    # after 1 Nc3 Nc6 2 Rb1
+    # system should change castling automatically to 'Kkq'
+    assert test.castling == 'kq'
+
+def test_Qkq_Blk_QR_Moved():
+    test = Fen('1rbqkbnr/pppppppp/2N5/8/4P3/2N5/PPPP1PPP/R1BQKBNR b Qkq - 1 3')
+    # after 1 Nc3 Nc6 2 e4 Rb8
+    # system should change castling automatically to 'KQk'
+    assert test.castling == 'Qk'
+
+def test_Qkq_Both_QR_Moved():
+    test = Fen('1rbqkbnr/pppppppp/2N5/8/8/2N5/PPPPPPPP/1RBQKBNR b Qkq - 1 3')
+    # after 1 Nc3 Nc6 2 Rb1 Rb8
+    # system should change castling automatically to 'Kk'
+    assert test.castling == 'k'
+# ----------------------------------------------------------- 9 tests: total 48
+
+# -------------------- test board display -------------------------------------
 
 def test_boardDisplay():
     test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
@@ -540,4 +694,5 @@ def test_boardDisplayNotExplicit():
     '\x1b[32m  2   \x1b[0m  P   P   P   P   .   P   P   P   \n',
     '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
     test.displayBoard()
-# -----------------------------------------------------------------------------
+
+# ----------------------------------------------------------- 2 tests: total 50

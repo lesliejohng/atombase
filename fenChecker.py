@@ -122,7 +122,7 @@ class Fen():
             self.toPlay = self.checkToPlay(toPlay = self.toPlay)
 
         if self.castling in self.validCastling:
-            pass #no change required
+            self.castling = self.checkCastling(castling = self.castling, board = self.board)
         elif self.castling == '?' or self.castling == '??':
             self.castling = self.checkCastling(castling = '?', board = self.board)
         else:
