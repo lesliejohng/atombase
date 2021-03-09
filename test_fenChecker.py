@@ -643,7 +643,7 @@ def test_Qkq_Both_QR_Moved():
     # after 1 Nc3 Nc6 2 Rb1 Rb8
     # system should change castling automatically to 'Kk'
     assert test.castling == 'k'
-# ----------------------------------------------------------- 9 tests: total 48
+# ---------------------------------------------------------- 18 tests: total 57
 
 # -------------------- test board display -------------------------------------
 
@@ -695,4 +695,4 @@ def test_boardDisplayNotExplicit():
     '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
     test.displayBoard()
 
-# ----------------------------------------------------------- 2 tests: total 50
+# ----------------------------------------------------------- 2 tests: total 59

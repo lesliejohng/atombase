@@ -402,3 +402,36 @@ was set.
 
 This occurred because I removed the contradictory element checks.
 ACTION: add them back!
+
+8/3/21
+
+completed pytests for automatic correction of castling, based on provided
+position.
+
+A similar automatic correction re ep square is required:-
+an ep square can only be correct if:-
+  - a valid string AND
+  - the space back from the ep square is blank AND
+  - the space in front of the ep square has the correctly coloured
+    pawn AND
+  - there is an enemy pawn on his 5th rank in an adjacent file
+
+9/3/21
+
+reset program following failure of ep checking extension.
+
+The amendment failed because it became too complex. The reason was because
+it became too difficult with the existing arrangements to interrogate the board.
+
+This suggests a change in the interrogateBoard method. In essence the idea would
+be make this method recieve an array of squares to interrogate and to return
+an array of items.
+
+Given the nature of this change I will establish a new branch to insure the changes
+do not damage the existing working program.
+
+ACTION:
+1) check pytest prior to changes: 59 checks correct
+2) added comments to methods
+3) removed staticmethods
+4) errors from pytest

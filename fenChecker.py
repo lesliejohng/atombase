@@ -26,16 +26,31 @@ class Fen():
         # A) castling
         self.recognisedCastling = ['q','k','kq','Q','Qq','Qk','Qkq','K',
                    'Kq','Kk','Kkq','KQ','KQq','KQk','KQkq']
+            # used to identify a castling element in a fen string
         self.validCastling = ['-','q','k','kq','Q','Qq','Qk','Qkq','K',
                    'Kq','Kk','Kkq','KQ','KQq','KQk','KQkq']
+            # used to confirm a valid castling element
+            # DOES NOT take into account the limitations imposed
+            # by the actual position
         # B) EP square
         self.recognisedEP =['a6','b6','c6','d6','e6','f6','g6','h6',
                             'a3','b3','c3','d3','e3','f3','g3','h3']
+            # used to identify an ep element in a fen string
         self.validEPwtp = ['-','a6','b6','c6','d6','e6','f6','g6','h6']
+            # valid ep elements if white to play
+            # DOES NOT take into account the limitations imposed
+            # by the actual position
         self.validEPbtp = ['-','a3','b3','c3','d3','e3','f3','g3','h3']
+            # valid ep elements if black to play
+            # DOES NOT take into account the limitations imposed
+            # by the actual position
         self.validEP = self.validEPwtp + self.validEPbtp
+            # valid ep elements ignoring who is to play
+            # DOES NOT take into account the limitations imposed
+            # by the actual position
         # C) board
         self.validBoardCharacters = '12345678/kqrnbpKQRBNP'
+            # valid characters for a board element of a fes string
         self.validSquares = ('a8','b8','c8','d8','e8','f8','g8','h8',
                             'a7','b7','c7','d7','e7','f7','g7','h7',
                             'a6','b6','c6','d6','e6','f6','g6','h6',
@@ -44,12 +59,13 @@ class Fen():
                             'a3','b3','c3','d3','e3','f3','g3','h3',
                             'a2','b2','c2','d2','e2','f2','g2','h2',
                             'a1','b1','c1','d1','e1','f1','g1','h1')
+            # valid squares
         # D) other
         self.errors = [] # used in the checkBoard method
 
         # processing of the fen starts here
         fen = str(fen) # forcing fen argument to a string
-        fen = fen.strip() #stripping leading/trailing white space
+        fen = fen.strip() # stripping leading/trailing white space
 
         # splitting fen into sub-strings
         self.fen = fen
@@ -167,21 +183,29 @@ class Fen():
     # This section is for routines which check fenElements
 
     def checkContradiction(self, existing, new):
+        # called by __init__
+        # compares two elements
+        # if not cotradictory returns the new elements
+        # if contradictory returns '??'
+
         if existing == '?': #value unset
             return new
         elif existing == '??':
             # contradictory elements in fen
-            return existing # leave '??' caution
+            return existing # leave '??' caution in place
         else: # check for contradictions
             if  existing == new:
                 # make no change to existing value
-                return existing
+                return new
             else: #contradictory elements in fen
                 return '??'
         print('Warning! checkContradiction. This should never print!')
 
     def checkBoard(self, board):
+        # called by __init__
         # this is a series of tests on the board to see if it valid
+        # responsible for checking of board
+        # returns a valid and checked board
         newBoard = ''
         # to force while loop to run
         self.errors.append('first time flag')
@@ -194,7 +218,7 @@ class Fen():
 
             # if the number of squares in the board is not 64 then some of
             # the subsequent methods will not work
-            boardString = self.boardToString(board, checkBoard = True)
+            boardString = self.boardToString(board = board, checkBoard = True)
                 # the boardToString method returns a string of 64 characters
                 # but also appends errors to self.errors if the original board
                 # was too short or too long'
@@ -243,7 +267,7 @@ class Fen():
                 self.errors.append(error)
 
             if self.errors:
-                self.displayBoardString(self.boardToString(board, checkBoard = True))
+                self.displayBoardString(self.boardToString(board = board, checkBoard = True))
                 print('\n')
                 board= self.inputBoard(reasons = self.errors, board= board)
 
@@ -252,7 +276,10 @@ class Fen():
         return board
 
     def checkToPlay(self, toPlay):
-
+        # called by __init__
+        # calls inputToPlay, which is responsible for returning
+            # a valid toPlay element
+        # returns a valid ep
         if toPlay == 'w' or toPlay == 'b':
             return toPlay
         else:
@@ -262,9 +289,14 @@ class Fen():
             message
             return self.inputToPlay()
 
-
     def checkCastling(self, castling, board):
-
+        # called by __init__
+        # calls inputCastling, which is responsible for returning a valid
+            # castling element
+        # processes to recieved value of castling by comparing it to the
+            # board automatically changing castling elements where these
+            # are clearly incorrect
+        # returns a valid and checked castling element
         if not castling in self.validCastling:
             message = WarningMsg(header = 'Castling: '+str(castling),
                     body = 'The Castling Element is not in a valid form',
@@ -272,13 +304,15 @@ class Fen():
             message
             castling = self.inputCastling()
 
-        boardString = self.boardToString(board)
-        e1 = self.interrogateBoard(boardString = boardString, targetSquare = 'e1')
-        h1 = self.interrogateBoard(boardString = boardString, targetSquare = 'h1')
-        a1 = self.interrogateBoard(boardString = boardString, targetSquare = 'a1')
-        e8 = self.interrogateBoard(boardString = boardString, targetSquare = 'e8')
-        h8 = self.interrogateBoard(boardString = boardString, targetSquare = 'h8')
-        a8 = self.interrogateBoard(boardString = boardString, targetSquare = 'a8')
+        boardString = self.boardToString(board = board)
+        checkedSquares = self.interrogateBoard(boardString = boardString,
+            targetSquares = ['e1','h1','a1','e8','h8','a8'])
+        e1 = checkedSquares[0]
+        h1 = checkedSquares[1]
+        a1 = checkedSquares[2]
+        e8 = checkedSquares[3]
+        h8 = checkedSquares[4]
+        a8 = checkedSquares[5]
 
         if castling == '-':
             newCastling = '-'
@@ -305,7 +339,7 @@ class Fen():
     def checkEP(self, ep, toPlay):
 
         if ep == '-':
-            return ep
+            return ep #assumed correct
         elif ep in self.validEP:
             if toPlay == 'w':
                 if ep in self.validEPwtp:
@@ -331,9 +365,10 @@ class Fen():
     # this section is for input routines which return a corrected value
     # these are static methods to allow mock input testing in pytest
 
-    @staticmethod
-    def inputBoard(board, reasons = []):
-
+    def inputBoard(self, board, reasons = []):
+        # called by checkBoard
+        # checkBoard is responsible for verifying position
+        # returns an unchecked board in fen format
         print('\n the board element of the current string is: \n',
                     board)
 
@@ -345,9 +380,9 @@ class Fen():
 
         return newBoard
 
-    @staticmethod
-    def inputToPlay():
-
+    def inputToPlay(self):
+        # called by checkToPlay
+        # returns a checked toPlay value
         newToPlay = '?'
         print('\n Is it white or black is to play in this position?')
         while newToPlay not in 'wb':
@@ -356,32 +391,30 @@ class Fen():
                 print('\n*** input incorrect ***\n')
         return newToPlay
 
-    @staticmethod
-    def inputCastling():
-
-        validCastling =['-','q','k','kq','Q','Qq','Qk','Qkq','K',
-                   'Kq','Kk','Kkq','KQ','KQq','KQk',
-                   'KQkq']
+    def inputCastling(self):
+        # called by checkCastling
+        # responsible to check return value against self.validCastling
+        # returns a generally valid castling value
         castling = '?'
-        while not castling in validCastling:
+        while not castling in self.validCastling:
             print('valid castling strings must be one of the following:')
-            print(validCastling)
+            print(self.validCastling)
             castling = input('please input one of these\n')
-            if not castling in validCastling:
+            if not castling in self.validCastling:
                 print('\n*** input incorrect ***\n')
         return castling
 
-    @staticmethod
-    def inputEP(toPlay):
-
-        validEPwtp = ['-','a6','b6','c6','d6','e6','f6','g6','h6']
-        validEPbtp = ['-','a3','b3','c3','d3','e3','f3','g3','h3']
+    def inputEP(self, toPlay):
+        # called by checkEP
+        # responsible to check return against self.validEPbtp or
+            # selfValidEPwtp
+        # return a valid ep square
         ep = '?'
 
         if toPlay == 'w':
-            validSquares = validEPwtp
+            validSquares = self.validEPwtp
         else:
-            validSquares = validEPbtp
+            validSquares = self.validEPbtp
 
         while not ep in validSquares :
             print('\nvalid inputs are:\n')
@@ -391,6 +424,15 @@ class Fen():
                 print('\n*** input incorrect ***\n')
 
         return ep
+
+    def inputSquare(self):
+        # called by square ToFenPosition
+        # responsible for checking return square if in self.validSquares
+        # returns a valid square name
+        square = '?'
+        while square not in self.validSquares:
+            square = input('please input a valid square')
+            return square
 
     # This section is for simple display options
 
@@ -435,13 +477,11 @@ class Fen():
         # convert board to string
         # if the number of squares in the board is not 64 then some of the
         boardString = ''
-
         if board == '':
-            if checkBoard: # if called by checkBoard
-                self.errors.append('Empty Board')
-                board = '8/8/8/8/8/8/8/8' #set to empty board
+            if checkBoard:
+                # self.board not set
+                board = '8/8/8/8/8/8/8/8' #empty board
             else:
-                # self.board no set if checkBoard running
                 board = self.board
 
         #convert board to string
@@ -455,8 +495,8 @@ class Fen():
                     boardString += char
             else:
                 boardString += '?' # identies invalid character
-        # ensure boardString is exactly 64 digits long
 
+        # ensure boardString is exactly 64 digits long
         if len(boardString) > 64:
             if checkBoard: # if called from checkBoard
                 self.errors.append('board has too many squares')
@@ -515,15 +555,23 @@ class Fen():
 # board searching
 
     def squareToFenPosition(self,square):
-        if square in self.validSquares:
-            return self.validSquares.index(square)
-        else:
-            return self.squareInput()
+        # called by interrogateBoard
+        # calls squareInput, which has responsibility to return a valid square
+        # return: integer in range 0 to 63
+        if square not in self.validSquares:
+            square = self.inputSquare()
 
-    def interrogateBoard(self, targetSquare, boardString = '' ):
+        return self.validSquares.index(square)
+
+    def interrogateBoard(self, targetSquares, boardString = '' ):
+        #called by checkCastling
+        # returns list of pieces on each target square
+        returnList = []
         if boardString == '':
-            boardString = self.board
-        return boardString[self.squareToFenPosition(targetSquare)]
+            boardString = self.boardToString(board = self.board)
+        for targetSquare in targetSquares:
+            returnList.append(boardString[self.squareToFenPosition(targetSquare)])
+        return returnList
 
 # fen reconstruction
 
