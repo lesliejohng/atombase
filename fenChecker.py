@@ -89,6 +89,8 @@ class Fen():
         self.toPlay = '?'
         self.castling = '?'
         self.ep = '?'
+        self.halfMove = '0'
+        self.move = '1'
 
         for element in self.fenElements:
             # does element look like a ToPlay element?
@@ -144,12 +146,22 @@ class Fen():
         else:
             self.castling = self.checkCastling(castling = self.castling, board = self.board)
 
+        #print(self.ep)
         if self.ep in self.validEP:
-            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay)
+            #print('__init__: valid ep')
+            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay, board = self.board)
+            #print('post ep type: '+ str(type(self.ep)))
+            #print('post checkEP: ' + self.ep)
         elif self.ep == '?' or self.ep == '??':
-            self.ep = self.checkEP(ep = '?', toPlay = self.toPlay)
+            #print('__init__: ep is ? or ??')
+            self.ep = self.checkEP(ep = '?', toPlay = self.toPlay, board = self.board)
+            #print('post ep type: '+ str(type(self.ep)))
+            #print('post checkEP: ' + self.ep)
         else:
-            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay)
+            #print('__init__: ep other invalid')
+            self.ep = self.checkEP(ep = self.ep, toPlay = self.toPlay, board = self.board)
+            #print('post ep type: '+ str(type(self.ep)))
+            #print('post checkEP: ' + self.ep)
 
         # if penultimate item on list is a digit
         # take this as the halfMove
@@ -336,31 +348,96 @@ class Fen():
             newCastling = '-'
         return newCastling
 
-    def checkEP(self, ep, toPlay):
-
+    def checkEP(self, ep, toPlay, board):
+        #print('checkEP in: '+ ep)
         if ep == '-':
-            return ep #assumed correct
+            newEP = ep #assumed correct
         elif ep in self.validEP:
             if toPlay == 'w':
                 if ep in self.validEPwtp:
-                    return ep
+                    newEP = ep
                 else:
                     message = WarningMsg(header = 'EP square: ' + str(ep),
                             body = 'The EP square is not valid in a "white to play" position')
                     message
-                    return self.inputEP(toPlay  = 'w')
-            else:
+                    newEP = self.inputEP(toPlay  = 'w')
+                    #print('checkEP: invalid wtp ')
+                    #print(newEP)
+                    #print(type(newEP))
+            elif toPlay == 'b':
                 if ep in self.validEPbtp:
-                    return ep
+                    newEP = ep
                 else:
                     message = WarningMsg(header = 'EP square' + str(ep),
                             body = 'The EP square is not valid in a "black to play" position')
                     message
-                    return self.inputEP(toPlay = 'b')
+                    newEP = self.inputEP(toPlay = 'b')
+                    #print('checkEP: invalid btp ')
+                    #print(newEP)
+                    #print(type(newEP))
         else:
-            return self.inputEP(toPlay = toPlay)
+            newEP = self.inputEP(toPlay = toPlay)
+            #print('checkEP: invalid ep'+ep)
+            #print(newEP)
+            #print(type(newEP))
 
-        print('warning! This message should never print.')
+        if newEP != '-': # if not set no further checks required
+            boardString = self.boardToString(board = board)
+            # find rank and file of ep
+            file = newEP[0]
+            #print(type(file))
+            rank = newEP[1]
+            #print(type(rank))
+            if newEP == 'a6':
+                checkedSquares = self.interrogateBoard(boardString = boardString,
+                    targetSquares = ['a7','a5','b5'])
+                if checkedSquares != ['.','p','P']:
+                    newEP = '-'
+            elif newEP == 'a3':
+                checkedSquares = self.interrogateBoard(boardString = boardString,
+                    targetSquares = ['a2','a4','b4'])
+                if checkedSquares != ['.','P','p']:
+                    newEP = '-'
+            elif newEP == 'h6':
+                checkedSquares = self.interrogateBoard(boardString = boardString,
+                    targetSquares = ['h7','h5','g5'])
+                if checkedSquares != ['.','p','P']:
+                    newEP = '-'
+            elif newEP == 'h3':
+                checkedSquares = self.interrogateBoard(boardString = boardString,
+                    targetSquares = ['h2','h4','g4'])
+                if checkedSquares != ['.','P','p']:
+                    newEP = '-'
+            else:
+                if toPlay == 'w':
+                    movedFromRank = '7'
+                    movedToRank = '5'
+                    attackerRank = '5'
+                    ownPawn = 'p'
+                    enemyPawn = 'P'
+                else:
+                    movedFromRank = '2'
+                    movedToRank = '4'
+                    attackerRank ='4'
+                    ownPawn = 'P'
+                    enemyPawn = 'p'
+                files = ['a','b','c','d','e','f','g','h']
+                currentFileNumber = files.index(file)
+                leftAttackFile = str(files[currentFileNumber-1])
+                rightAttackFile = str(files[currentFileNumber+1])
+                checkedSquares = self.interrogateBoard(boardString = boardString,
+                                targetSquares = [file+movedFromRank,
+                                        file+movedToRank,
+                                        leftAttackFile+attackerRank,
+                                        rightAttackFile+attackerRank])
+                print(checkedSquares)
+                if checkedSquares == ['.',ownPawn,enemyPawn,enemyPawn] or checkedSquares == ['.',ownPawn,enemyPawn,'.'] or checkedSquares == ['.',ownPawn,'.',enemyPawn] :
+                    pass
+                else:
+                    newEP = '-'
+        #print('checkEP return')
+        #print(type(newEP))
+        return newEP
 
     # this section is for input routines which return a corrected value
     # these are static methods to allow mock input testing in pytest
@@ -419,10 +496,12 @@ class Fen():
         while not ep in validSquares :
             print('\nvalid inputs are:\n')
             print(validSquares)
-            ep = input('\n please input "-" if no, or a valid ep square\n')
+            ep = input('\n please input "-" if no ep square, or a valid ep square\n')
             if not ep in validSquares:
                 print('\n*** input incorrect ***\n')
 
+        #print(ep)
+        #print(type(ep))
         return ep
 
     def inputSquare(self):

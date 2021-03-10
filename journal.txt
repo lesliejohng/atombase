@@ -434,4 +434,26 @@ ACTION:
 1) check pytest prior to changes: 59 checks correct
 2) added comments to methods
 3) removed staticmethods
-4) errors from pytest
+4) errors from pytest- corrected: 59 checks correct
+5) change input/ output to lists
+6) run tests: 59 passed
+7) commit changes
+8) add automatic correction of ep squares
+    a) add board element to call to checkEP
+    b) change to indirect return
+    c) pytest: 59 passed
+    d) interrogateBoard added to checkEP
+    e) pytest: 15 failed 44 passed (expected fqilures)
+
+10/3/21
+
+The failures were in unexpected tests.
+
+corrected and committed.
+
+TO DO
+A) build extra corrected ep pytest - each file and colour
+B) add massages where castling or ep automatically corrected
+C) add automatic correction of halfMove if there is a valid ep
+D) add pytest for halfMove correction
+E) add massage when halfMove automatically corrected
