@@ -282,7 +282,8 @@ def test_castling_None_EPok():
     assert test.castling == '-'
     # e3 is valid
     assert test.ep == 'e3'
-    assert test.halfMove == '1'
+    assert test.halfMove == '0' # last move was pawn move
+
     assert test.move == '2'
 
 def test_castling_ep():
@@ -319,7 +320,7 @@ def test_2Blanks_ep_setCorrectly():
     assert test.toPlay == 'b'
     assert test.castling == '-'
     assert test.ep == 'e3'
-    assert test.halfMove == '1'
+    assert test.halfMove == '0' # last move was pawn move
     assert test.move == '2'
 
 # ----------------------------------------------------------- 7 tests: total 22

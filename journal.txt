@@ -461,3 +461,6 @@ E) add massage when halfMove automatically corrected
 11/3/21
 
 ep pytest completed
+
+message added where castling or ep has been automatically
+changed.

@@ -169,7 +169,10 @@ class Fen():
             if self.fenElements[-2].isdigit() and self.fenElements[-1].isdigit():
             # the penultimate sub-string is not accepted is the last sub-string
             # is not also a digit
-                self.halfMove = self.fenElements[-2]
+                if self.ep != '-':
+                    self.halfMove = '0'
+                else:
+                    self.halfMove = self.fenElements[-2]
             else:
                 # reset value to 0
                 self.halfMove = '0'
