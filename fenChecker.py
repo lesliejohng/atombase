@@ -343,13 +343,20 @@ class Fen():
                 if char == 'q':
                     if e8 == 'k' and a8 == 'r':
                         newCastling += 'q'
+            if newCastling != castling:
+                message = WarningMsg(header = 'provided castling: ' + str(castling),
+                        body = 'was inconsistant with rook and king positions',
+                        instruction = 'was changed to: '+ str(newCastling))
+                message
 
         if newCastling == '':
             newCastling = '-'
+
         return newCastling
 
     def checkEP(self, ep, toPlay, board):
         #print('checkEP in: '+ ep)
+        providedEP = ep
         if ep == '-':
             newEP = ep #assumed correct
         elif ep in self.validEP:
@@ -361,6 +368,7 @@ class Fen():
                             body = 'The EP square is not valid in a "white to play" position')
                     message
                     newEP = self.inputEP(toPlay  = 'w')
+                    providedEP = newEP
                     #print('checkEP: invalid wtp ')
                     #print(newEP)
                     #print(type(newEP))
@@ -372,11 +380,13 @@ class Fen():
                             body = 'The EP square is not valid in a "black to play" position')
                     message
                     newEP = self.inputEP(toPlay = 'b')
+                    providedEP = newEP
                     #print('checkEP: invalid btp ')
                     #print(newEP)
                     #print(type(newEP))
         else:
             newEP = self.inputEP(toPlay = toPlay)
+            providedEP = newEP
             #print('checkEP: invalid ep'+ep)
             #print(newEP)
             #print(type(newEP))
@@ -436,6 +446,13 @@ class Fen():
                     pass
                 else:
                     newEP = '-'
+
+            if providedEP != newEP:
+                message = WarningMsg(header = 'provided ep: ' + str(providedEP),
+                    body = 'was inconsistant with pawn positions',
+                    instruction = 'was changed to "-"')
+                message
+
         #print('checkEP return')
         #print(type(newEP))
         return newEP
