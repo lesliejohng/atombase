@@ -457,3 +457,7 @@ B) add massages where castling or ep automatically corrected
 C) add automatic correction of halfMove if there is a valid ep
 D) add pytest for halfMove correction
 E) add massage when halfMove automatically corrected
+
+11/3/21
+
+ep pytest completed

@@ -488,7 +488,183 @@ def test_epbtpInvalid():
         assert test.halfMove == '1'
         assert test.move == '2'
 
-# ----------------------------------------------------------- 5 tests: total 36
+def test_ep_a6_correct():
+    test = Fen('4k3/8/8/pP6/8/8/8/4K3 w - a6 0 1')
+    assert test.ep == 'a6'
+
+def test_ep_a6_incorrect():
+    test = Fen('4k3/8/8/p1P5/8/8/8/4K3 w - a6 0 1')
+    assert test.ep == '-'
+
+def test_ep_b6_correctRA():
+    test = Fen('4k3/8/8/1pP5/8/8/8/4K3 w - b6 0 1')
+    assert test.ep == 'b6'
+
+def test_ep_b6_correctLA():
+    test = Fen('4k3/8/8/Pp6/8/8/8/4K3 w - b6 0 1')
+    assert test.ep == 'b6'
+
+def test_ep_b6_incorrect():
+    test = Fen('4k3/8/8/1p1P4/8/8/8/4K3 w - b6 0 1')
+    assert test.ep == '-'
+
+def test_ep_c6_correctRA():
+    test = Fen('4k3/8/8/2pP4/8/8/8/4K3 w - c6 0 1')
+    assert test.ep == 'c6'
+
+def test_ep_c6_correctLA():
+    test = Fen('4k3/8/8/1Pp5/8/8/8/4K3 w - c6 0 1')
+    assert test.ep == 'c6'
+
+def test_ep_c6_incorrect():
+    test = Fen('4k3/8/8/2p1P3/8/8/8/4K3 w - c6 0 1')
+    assert test.ep == '-'
+
+def test_ep_d6_correctRA():
+    test = Fen('4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1')
+    assert test.ep == 'd6'
+
+def test_ep_d6_correctLA():
+    test = Fen('4k3/8/8/2Pp4/8/8/8/4K3 w - d6 0 1')
+    assert test.ep == 'd6'
+
+def test_ep_d6_incorrect():
+    test = Fen('4k3/8/8/3p1P2/8/8/8/4K3 w - d6 0 1')
+    assert test.ep == '-'
+
+def test_ep_e6_correctRA():
+    test = Fen('4k3/8/8/4pP2/8/8/8/4K3 w - e6 0 1')
+    assert test.ep == 'e6'
+
+def test_ep_e6_correctLA():
+    test = Fen('4k3/8/8/3Pp3/8/8/8/4K3 w - e6 0 1')
+    assert test.ep == 'e6'
+
+def test_ep_e6_incorrect():
+    test = Fen('4k3/8/8/4p1P1/8/8/8/4K3 w - e6 0 1')
+    assert test.ep == '-'
+
+def test_ep_f6_correctRA():
+    test = Fen('4k3/8/8/5pP1/8/8/8/4K3 w - f6 0 1')
+    assert test.ep == 'f6'
+
+def test_ep_f6_correctLA():
+    test = Fen('4k3/8/8/4Pp2/8/8/8/4K3 w - f6 0 1')
+    assert test.ep == 'f6'
+
+def test_ep_f6_incorrect():
+    test = Fen('4k3/8/8/5p1P/8/8/8/4K3 w - f6 0 1')
+    assert test.ep == '-'
+
+def test_ep_g6_correctRA():
+    test = Fen('4k3/8/8/6pP/8/8/8/4K3 w - g6 0 1')
+    assert test.ep == 'g6'
+
+def test_ep_g6_correctLA():
+    test = Fen('4k3/8/8/5Pp1/8/8/8/4K3 w - g6 0 1')
+    assert test.ep == 'g6'
+
+def test_ep_g6_incorrect():
+    test = Fen('4k3/8/8/P5p1/8/8/8/4K3 w - g6 0 1')
+    assert test.ep == '-'
+
+def test_ep_h6_correct():
+    test = Fen('4k3/8/8/6Pp/8/8/8/4K3 w - h6 0 1')
+    assert test.ep == 'h6'
+
+def test_ep_h6_incorrect():
+    test = Fen('4k3/8/8/1P5p/8/8/8/4K3 w - h6 0 1')
+    assert test.ep == '-'
+
+def test_ep_a3_correct():
+    test = Fen('4k3/8/8/8/Pp6/8/8/4K3 b - a3 0 1')
+    assert test.ep == 'a3'
+
+def test_ep_a3_incorrect():
+    test = Fen('4k3/8/8/8/P1p5/8/8/4K3 b - a3 0 1')
+    assert test.ep == '-'
+
+def test_ep_b3_correctRA():
+    test = Fen('4k3/8/8/8/1Pp5/8/8/4K3 b - b3 0 1')
+    assert test.ep == 'b3'
+
+def test_ep_b3_correctLA():
+    test = Fen('4k3/8/8/8/pP6/8/8/4K3 b - b3 0 1')
+    assert test.ep == 'b3'
+
+def test_ep_b3_incorrect():
+    test = Fen('4k3/8/8/8/1P1p4/8/8/4K3 b - b3 0 1')
+    assert test.ep == '-'
+
+def test_ep_c3_correctRA():
+    test = Fen('4k3/8/8/8/2Pp4/8/8/4K3 b - c3 0 1')
+    assert test.ep == 'c3'
+
+def test_ep_c3_correctLA():
+    test = Fen('4k3/8/8/8/1pP5/8/8/4K3 b - c3 0 1')
+    assert test.ep == 'c3'
+
+def test_ep_c3_incorrect():
+    test = Fen('4k3/8/8/8/2P1p3/8/8/4K3 b - c3 0 1')
+    assert test.ep == '-'
+
+def test_ep_d3_correctRA():
+    test = Fen('4k3/8/8/8/3Pp3/8/8/4K3 b - d3 0 1')
+    assert test.ep == 'd3'
+
+def test_ep_d3_correctLA():
+    test = Fen('4k3/8/8/8/2pP4/8/8/4K3 b - d3 0 1')
+    assert test.ep == 'd3'
+
+def test_ep_d3_incorrect():
+    test = Fen('4k3/8/8/8/3P1p2/8/8/4K3 b - d3 0 1')
+    assert test.ep == '-'
+
+def test_ep_e3_correctRA():
+    test = Fen('4k3/8/8/8/4Pp2/8/8/4K3 b - e3 0 1')
+    assert test.ep == 'e3'
+
+def test_ep_e3_correctLA():
+    test = Fen('4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1')
+    assert test.ep == 'e3'
+
+def test_ep_e3_incorrect():
+    test = Fen('4k3/8/8/8/4p1P1/8/8/4K3 b - e3 0 1')
+    assert test.ep == '-'
+
+def test_ep_f3_correctRA():
+    test = Fen('4k3/8/8/8/5Pp1/8/8/4K3 b - f3 0 1')
+    assert test.ep == 'f3'
+
+def test_ep_f3_correctLA():
+    test = Fen('4k3/8/8/8/4pP2/8/8/4K3 b - f3 0 1')
+    assert test.ep == 'f3'
+
+def test_ep_f3_incorrect():
+    test = Fen('4k3/8/8/8/5P1p/8/8/4K3 b - f3 0 1')
+    assert test.ep == '-'
+
+def test_ep_g3_correctRA():
+    test = Fen('4k3/8/8/8/6Pp/8/8/4K3 b - g3 0 1')
+    assert test.ep == 'g3'
+
+def test_ep_g3_correctLA():
+    test = Fen('4k3/8/8/8/5pP1/8/8/4K3 b - g3 0 1')
+    assert test.ep == 'g3'
+
+def test_ep_g3_incorrect():
+    test = Fen('4k3/8/8/8/p5P1/8/8/4K3 b - g3 0 1')
+    assert test.ep == '-'
+
+def test_ep_h3_correct():
+    test = Fen('4k3/8/8/8/6pP/8/8/4K3 b - h3 0 1')
+    assert test.ep == 'h3'
+
+def test_ep_h3_incorrect():
+    test = Fen('4k3/8/8/8/1p5P/8/8/4K3 b - h3 0 1')
+    assert test.ep == '-'
+
+# ---------------------------------------------------------- 49 tests: total 80
 
 # -------------------- fen elements out of order ------------------- ----------
 # valid toPlay, castling and ep should be recognised
@@ -503,7 +679,7 @@ def test_orderFenValidEP():
     assert test.move == '3'
     assert str(test) == 'rnbqkbnr/ppp2ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
 
-# ------------------------------------------------------------ 1 test: total 37
+# ------------------------------------------------------------ 1 test: total 81
 
 # ------------------- board errors: kings -------------------------------------
 
@@ -552,7 +728,7 @@ def test_manyBlackKings():
         assert test.halfMove == '1'
         assert test.move == '2'
 
-# ----------------------------------------------------------- 4 tests: total 41
+# ----------------------------------------------------------- 4 tests: total 85
 
 # -------------------- castling: Board incorrect ------------------------------
 
@@ -668,7 +844,7 @@ def test_Qkq_Both_QR_Moved():
     # after 1 Nc3 Nc6 2 Rb1 Rb8
     # system should change castling automatically to 'Kk'
     assert test.castling == 'k'
-# ---------------------------------------------------------- 18 tests: total 59
+# --------------------------------------------------------- 18 tests: total 103
 
 # -------------------- test board display -------------------------------------
 
@@ -720,4 +896,4 @@ def test_boardDisplayNotExplicit():
     '\x1b[32m  1   \x1b[0m  R   N   B   Q   K   B   .   R   \n']
     test.displayBoard()
 
-# ----------------------------------------------------------- 2 tests: total 61
+# ---------------------------------------------------------- 2 tests: total 105

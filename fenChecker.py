@@ -396,6 +396,7 @@ class Fen():
             elif newEP == 'a3':
                 checkedSquares = self.interrogateBoard(boardString = boardString,
                     targetSquares = ['a2','a4','b4'])
+                #print(checkedSquares)
                 if checkedSquares != ['.','P','p']:
                     newEP = '-'
             elif newEP == 'h6':
