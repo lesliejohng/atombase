@@ -464,3 +464,6 @@ ep pytest completed
 
 message added where castling or ep has been automatically
 changed.
+
+change halfMove to = '0', where there is a valid ep: tested
+105 passed 

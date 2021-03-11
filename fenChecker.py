@@ -171,6 +171,10 @@ class Fen():
             # is not also a digit
                 if self.ep != '-':
                     self.halfMove = '0'
+                    message = WarningMsg(header = 'provided halfMove: ' + str(self.halfMove),
+                            body = 'was inconsistant with existance of a valid ep square.',
+                            instruction = 'A pawn was just moved so halfMove set to "0" ')
+                    message
                 else:
                     self.halfMove = self.fenElements[-2]
             else:
