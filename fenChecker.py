@@ -311,6 +311,7 @@ class Fen():
                 message
                 self.errors.append(error)
 
+
             # no more than 8 pawns of each colour
             if whitePawns > 8:
                 error = 'There are too many white pawns on the board'
@@ -514,7 +515,6 @@ class Fen():
         # returns an unchecked board in fen format
         print('\n the board element of the current string is: \n',
                     board)
-
         if reasons:
             print('\n the current board is incorrect because: \n',
                     reasons)
@@ -584,7 +584,7 @@ class Fen():
     def displayBoardString(self, boardString = ''):
 
         if boardString == '':
-            self.boardToArray()
+            boardString = self.boardToString(self.board)
 
         printable = ''
         for i in range(64):
@@ -598,7 +598,7 @@ class Fen():
     def displayBoard(self, boardArray = ''):
 
         if boardArray == '':
-            self.boardToArray()
+            boardArray = self.boardToArray(self.board)
 
         print('\n')
         for rank in boardArray:
@@ -621,6 +621,8 @@ class Fen():
     def boardToString(self, board = '', checkBoard = False):
         # convert board to string
         # if the number of squares in the board is not 64 then some of the
+        if board == '':
+            board = self.board
         boardString = ''
         if board == '':
             if checkBoard:
