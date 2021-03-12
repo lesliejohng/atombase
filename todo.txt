@@ -1,20 +1,18 @@
 As for the external setting of variables I need to decide which are
 'protected' and change their names accordingly.
 
-I need to move back from the idea of the fenElementDict, as this creates
-a readability issue: make dictionary calls variables again.
-use Find> Replace All for this
-
 Again readability move 'main processing routines' from __init__ to separate
 method
 
 Continue annotation of positionValidity.py
+
+add cautions for positions that are possible, but unlikely:
+A) two black or white square bishops
+B) more than 2 bishops of same colour
+C) more than 2 knights of same colour
 
 *********************************************************************
 
 Other changes
 
 Add recognition of 50 move rule in checking of fenHalfMoveClock
-
-consider whether I was right to make each of the input methods a
-@staticmethod

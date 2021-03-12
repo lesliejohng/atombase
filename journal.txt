@@ -466,4 +466,20 @@ message added where castling or ep has been automatically
 changed.
 
 change halfMove to = '0', where there is a valid ep: tested
-105 passed 
+105 passed
+
+12/3/21
+
+merged changeInterrogateBoard with master.
+
+pytest: 105 passed
+
+TO DO
+A) no pawn on 1st or 8th rank
+B) less than 9 pawns on board for each side
+C) pawns + queens on board less than 10 for each side
+D) pawns + queens + rooks on board less than 12 for each side
+
+implemented too many pawns, which picked up 9 failings in other pytests.
+
+All corrected: passed 107/107 tests

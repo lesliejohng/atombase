@@ -252,11 +252,37 @@ class Fen():
                     message
                     self.errors.append(error)
 
-            # test that there are two kings on the board
-            # (one White and one Black)
+            # count piece and pawn numbers
+            totalWhitePieces = 0
+            totalBlackPieces = 0
             whiteKings = board.count('K')
+            totalWhitePieces += whiteKings
             blackKings = board.count('k')
+            totalBlackPieces += blackKings
+            whiteQueens = board.count('Q')
+            totalWhitePieces += whiteQueens
+            blackQueens = board.count('q')
+            totalBlackPieces += blackQueens
+            whiteRooks = board.count('R')
+            totalWhitePieces += whiteRooks
+            blackRooks = board.count('r')
+            totalBlackPieces += blackRooks
+            whiteBishops = board.count('B')
+            totalWhitePieces += whiteBishops
+            blackBishops = board.count('b')
+            totalBlackPieces += blackBishops
+            whiteKnights = board.count('N')
+            totalWhitePieces += whiteKnights
+            blackKnights = board.count('n')
+            totalBlackPieces += blackKnights
+            whitePawns = board.count('P')
+            totalWhitePieces += whitePawns
+            blackPawns = board.count('p')
+            totalWhitePieces += blackPawns
+            emptySquares = board.count('.')
+            totalUsedSquares = 64 - emptySquares
 
+            # exactly one king for each side
             if whiteKings == 0:
                 error = 'There is no White King on the board'
                 message = WarningMsg(header = 'Illegal Position',
@@ -282,6 +308,21 @@ class Fen():
                 error = 'There are too many Black Kings on the board'
                 message = WarningMsg(header = 'Illegal Position',
                     body = error)
+                message
+                self.errors.append(error)
+
+            # no more than 8 pawns of each colour
+            if whitePawns > 8:
+                error = 'There are too many white pawns on the board'
+                message = WarningMsg(header = 'Illegal Position',
+                    body = error, instruction = ' board has ' + str(whitePawns) + ' white pawns')
+                message
+                self.errors.append(error)
+
+            if blackPawns > 8:
+                error = 'There are too many black pawns on the board'
+                message = WarningMsg(header = 'Illegal Position',
+                    body = error, instruction = ' board has ' + str(blackPawns) + ' black pawns')
                 message
                 self.errors.append(error)
 
