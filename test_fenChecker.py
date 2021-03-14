@@ -924,3 +924,23 @@ def test_tooManyBlackPawns():
         assert test.move == '2'
 
 # ---------------------------------------------------------- 2 tests: total 107
+
+# ------------------- pawns on 1st or 8th rank --------------------------------
+
+def test_whtPawnsOn1st():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPP2PPP/RNPQKB1R b KQkq - 1 2')
+
+def test_whtPawnsOn8th():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen('rnbqkPnr/pppp1ppp/8/4p3/4P3/5N2/PPP2PPP/RNBQKB1R b KQkq - 1 2')
+
+def test_blkPawnsOn1st():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen('rnbqkbnr/ppp2ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKp1R b KQkq - 1 2')
+
+def test_blkPawnsOn8th():
+    with mock.patch('builtins.input',side_effect = ['rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R']):
+        test = Fen('rnbqkpnr/ppp2ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
+
+# ---------------------------------------------------------- 4 tests: total 111

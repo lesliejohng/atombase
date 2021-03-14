@@ -483,3 +483,7 @@ D) pawns + queens + rooks on board less than 12 for each side
 implemented too many pawns, which picked up 9 failings in other pytests.
 
 All corrected: passed 107/107 tests
+
+13/3/21
+
+added check for pawns on 1st or 8th ranks: pytests 111/111

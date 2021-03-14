@@ -50,7 +50,7 @@ class Fen():
             # by the actual position
         # C) board
         self.validBoardCharacters = '12345678/kqrnbpKQRBNP'
-            # valid characters for a board element of a fes string
+            # valid characters for a board element of a fen string
         self.validSquares = ('a8','b8','c8','d8','e8','f8','g8','h8',
                             'a7','b7','c7','d7','e7','f7','g7','h7',
                             'a6','b6','c6','d6','e6','f6','g6','h6',
@@ -59,9 +59,10 @@ class Fen():
                             'a3','b3','c3','d3','e3','f3','g3','h3',
                             'a2','b2','c2','d2','e2','f2','g2','h2',
                             'a1','b1','c1','d1','e1','f1','g1','h1')
-            # valid squares
         # D) other
         self.errors = [] # used in the checkBoard method
+        self.rank1 = ['a1','b1','c1','d1','e1','f1','g1','h1']
+        self.rank8 = ['a8','b8','c8','d8','e8','f8','g8','h8']
 
         # processing of the fen starts here
         fen = str(fen) # forcing fen argument to a string
@@ -281,6 +282,7 @@ class Fen():
             totalWhitePieces += blackPawns
             emptySquares = board.count('.')
             totalUsedSquares = 64 - emptySquares
+            boardString = self.boardToString(board = board)
 
             # exactly one king for each side
             if whiteKings == 0:
@@ -324,6 +326,41 @@ class Fen():
                 error = 'There are too many black pawns on the board'
                 message = WarningMsg(header = 'Illegal Position',
                     body = error, instruction = ' board has ' + str(blackPawns) + ' black pawns')
+                message
+                self.errors.append(error)
+
+            # white pawns on 1st or 8th ranks
+
+            rank1 = self.interrogateBoard(targetSquares = self.rank1,
+                                        boardString = boardString)
+            rank8 = self.interrogateBoard(targetSquares = self.rank8,
+                                        boardString = boardString)
+
+            if rank1.count('P'):
+                error = 'There are white pawns on the 1st rank'
+                message = WarningMsg(header = 'Illegal Position',
+                    body = error)
+                message
+                self.errors.append(error)
+
+            if rank8.count('P'):
+                error = 'There are white pawns on the 8th rank'
+                message = WarningMsg(header = 'Illegal Position',
+                    body = error)
+                message
+                self.errors.append(error)
+
+            if rank1.count('p'):
+                error = 'There are black pawns on the 1st rank'
+                message = WarningMsg(header = 'Illegal Position',
+                    body = error)
+                message
+                self.errors.append(error)
+
+            if rank8.count('p'):
+                error = 'There are black pawns on the 8th rank'
+                message = WarningMsg(header = 'Illegal Position',
+                    body = error)
                 message
                 self.errors.append(error)
 
