@@ -487,3 +487,5 @@ All corrected: passed 107/107 tests
 13/3/21
 
 added check for pawns on 1st or 8th ranks: pytests 111/111
+
+check queens + pawns > 9

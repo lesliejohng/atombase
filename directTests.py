@@ -9,6 +9,7 @@ Please select one on the following options
 a) test display of board
 b) test too many pawns
 c) pawns on 1st or 8th rank
+d) pawns + queens more than 9
 z) to finish tests
 
 """)
@@ -54,10 +55,12 @@ or you can type your own!
         wait = input('press any key to continue\n')
         test.displayBoard()
         wait = input('press any key to continue\n')
-        test.displayBoard()
+        y = test.augmentBoard()
+        test.displayBoard(y)
         wait = input('press any key to continue\n')
 
 # -----------------------------------------------------------------------------
+
     elif selection == 'b':
         print("""
 
@@ -103,6 +106,25 @@ copy the above to save typing!
         wait = input('press any key to continue\n')
 
 
+# -----------------------------------------------------------------------------
+
+    elif selection == 'd':
+        print("""
+
+for these tests the correct board element of the fen is:-
+rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R
+
+copy the above to save typing!
+
+\n""")
+
+        print('White: queens plus pawns more than 9\n')
+        test = Fen('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPP2PPP/RNQQKB1R b KQkq - 1 2')
+        wait = input('press any key to continue\n')
+
+        print('Black: queens plus pawns more than 9\n')
+        test = Fen('rnqqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPP2PPP/RNBQKB1R b KQkq - 1 2')
+        wait = input('press any key to continue\n')
 
     elif selection == 'z':
         break

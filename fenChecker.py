@@ -329,7 +329,25 @@ class Fen():
                 message
                 self.errors.append(error)
 
-            # white pawns on 1st or 8th ranks
+            # total of pawns and queens not more that 9
+
+            if whiteQueens > 1:
+                if whitePawns + whiteQueens > 9:
+                    error = 'White queens plus pawns should not be more than 9'
+                    message = WarningMsg(header = 'Illegal Position',
+                        body = error, instruction = ' White has ' + str(whitePawns) + ' pawns ' + str(whiteQueens) + ' queens')
+                    message
+                    self.errors.append(error)
+
+            if blackQueens > 1:
+                if blackPawns + blackQueens > 9:
+                    error = 'Black queens plus pawns should not be more than 9'
+                    message = WarningMsg(header = 'Illegal Position',
+                        body = error, instruction = ' Black has ' + str(blackPawns) + ' pawns ' + str(blackQueens) + ' queens')
+                    message
+                    self.errors.append(error)
+
+            # white or black pawns on 1st or 8th ranks
 
             rank1 = self.interrogateBoard(targetSquares = self.rank1,
                                         boardString = boardString)
