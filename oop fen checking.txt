@@ -1,0 +1,58 @@
+                  recognise castling
+                  valid castling
+                  recognise ep
+                  valid ep
+                                      board geometry
+                                                         move capabilities
+                                                         cautions
+                                                         best square
+______________________________________________________________________________
+                  Fen                 Board              Piece
+
+Actor >>>fen>>>   | str()
+                  | id elements
+                  | allocate '-'
+                  | chk validchar >>> |              >>>  | char
+                  |               <<< |              <<<  |
+                  | interrogate   >>> | count
+                  |               <<< |
+                  |   [message]
+                  | [input board]
+                  | ^ loop
+                  | validToPlay
+                  |  [input] >>>
+                     <<<valid<<<
+                  | consistent?   >>> | k chk?
+                                  <<< |
+                  |   [message]
+                  | validCastling
+                  |  [input] >>>
+                     <<<valid<<<
+                  | chk castling
+                  | consistent?   >>> | kr pstn
+                                  <<< |
+                  |   [message]
+                  | validEP
+                  |  [input] >>>
+                     <<<valid<<<
+                  | chk ep        >>> | p pstn
+                                  <<< |
+                  |   [message]
+                  | set hm m
+
+______________________________________________________________________________
+                  InputBoard          Board             Piece
+
+Fen >>>error>>>   | disp board    >>> | display     >>> | char
+                                                    <<< |
+                  | input
+<<<unchecked<<<   |
+
+______________________________________________________________________________
+                  InputOther
+Fen >>>error>>>   | disp board    >>> | display     >>> | char
+                                                    <<< |
+                  | input
+                  | valid?
+                  |  ^loop
+   <<<checked<<<  |

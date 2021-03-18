@@ -489,3 +489,24 @@ All corrected: passed 107/107 tests
 added check for pawns on 1st or 8th ranks: pytests 111/111
 
 check queens + pawns > 9
+
+15/3/21
+
+pytests good, but rethinking OOP. What I have written is largely
+functional, hidden in a class. A more comprehensive OOP approach
+would be to have classes for fen, piece, square and board.
+
+Thinking in this way would give the following:-
+
+fen - fenSting: checkXXX(), reconstructFen()
+piece - name: asCharacter(), asColouredCharacter(), asUnicode()
+square - name, content: attackedBy(), connectedSquares()
+board - squares: display(), interrogate(), relativeInterrogate()
+
+Changing this is a major change, is it worth it?
+
+How do I get from here to there?
+
+ACTION: Create branch
+
+start oop text file.

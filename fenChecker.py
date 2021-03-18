@@ -18,6 +18,58 @@ class WarningMsg():
             print('\n     ',instruction,'\n')
         print('*' * asterixNo,'\n')
 
+class Piece():
+
+    def __init__(self, pieceChar, moveLimit, moveDirections):
+        self._pieceChar = pieceChar
+        self._moveLimit = moveLimit
+        self._moveDirections = moveDirections
+
+    def getPieceChar(self):
+        return self._pieceChar
+
+    def getMoveLimit(self):
+        return self._moveLimit
+
+    # directions ['N','NNE','NE','ENE','E','ESE','SE','SSE',
+    #                'S','SSW','SW','WSW','W','WNW','NW','NNW']
+    def getMoveDirections(self):
+        return self._moveDirections
+
+class King(Piece):
+
+    def __init__(self, pieceChar):
+        super().__init__(pieceChar = pieceChar,
+                            moveLimit = 1,
+                            moveDirections = ['N','NE','E','SE',
+                                            'S','SW','W','NW'])
+
+class WhiteKing(King):
+    def __init__(self):
+        super().__init__(pieceChar = 'K')
+
+class BlackKing(King):
+    def __init__(self):
+        super().__init__(pieceChar = 'k')
+
+class Board():
+    _directions = ['N','NNE','NE','ENE','E','ESE','SE','SSE',
+                        'S','SSW','SW','WSW','W','WNW','NW','NNW']
+    _files = ['a','b','c','d','e','f','g','h']
+    _ranks = ['1','2','3','4','5','6','7','8']
+    _squares = ['a8','b8','c8','d8','e8','f8','g8','h8',
+                    'a7','b7','c7','d7','e7','f7','g7','h7',
+                    'a6','b6','c6','d6','e6','f6','g6','h6',
+                    'a5','b5','c5','d5','e5','f5','g5','h5',
+                    'a4','b4','c4','d4','e4','f4','g4','h4',
+                    'a3','b3','c3','d3','e3','f3','g3','h3',
+                    'a2','b2','c2','d2','e2','f2','g2','h2',
+                    'a1','b1','c1','d1','e1','f1','g1','h1']
+
+    def __init__(self, fenBoard, fenToPlay, fenCastling,
+                    fenEP, halfMove, move):
+        pass
+
 class Fen():
 
     def __init__(self, fen = '?'):
@@ -789,11 +841,15 @@ class Fen():
 
 
 # initial test
-def main():
-    print('starting direct tests\n')
-    test=Fen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq e6 0 1')
-    print('should be starting position with e6 as a epsquare: ')
-    print(test.board, test.toPlay, test.castling, test.ep, test.halfMove, test.move)
 
-if __name__ == '__main__' :
-    main()
+print('starting direct tests: White King\n')
+test = WhiteKing()
+print(test.getPieceChar())
+print(test.getMoveLimit())
+print(test.getMoveDirections())
+
+print('starting direct tests: Black King\n')
+test = BlackKing()
+print(test.getPieceChar())
+print(test.getMoveLimit())
+print(test.getMoveDirections())
