@@ -1,5 +1,5 @@
 import pytest
-from fenChecker import Fen, WarningMsg
+from fenChecker import Fen, WarningMsg, WhiteKing, BlackKing
 import mock
 
 startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -944,3 +944,20 @@ def test_blkPawnsOn8th():
         test = Fen('rnbqkpnr/ppp2ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2')
 
 # ---------------------------------------------------------- 4 tests: total 111
+
+# -------------------- OOP piece tests ----------------------------------------
+
+def test_oop_WhiteKing():
+    test = WhiteKing()
+    assert test.getPieceChar() == 'K'
+    assert test.getMoveLimit() == 1
+    assert test.getMoveDirections() == ['N','NE','E','SE',
+                                        'S','SW','W','NW']
+
+def test_oop_BlackKing():
+    test = BlackKing()
+    assert test.getPieceChar() == 'k'
+    assert test.getMoveLimit() == 1
+    assert test.getMoveDirections() == ['N','NE','E','SE','S','SW','W','NW']
+
+# ---------------------------------------------------------- 2 tests: total 113

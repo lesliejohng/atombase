@@ -20,10 +20,11 @@ class WarningMsg():
 
 class Piece():
 
-    def __init__(self, pieceChar, moveLimit, moveDirections):
+    def __init__(self, pieceChar, moveLimit, moveDirections, caller):
         self._pieceChar = pieceChar
         self._moveLimit = moveLimit
         self._moveDirections = moveDirections
+        self._caller = caller
 
     def getPieceChar(self):
         return self._pieceChar
@@ -36,21 +37,25 @@ class Piece():
     def getMoveDirections(self):
         return self._moveDirections
 
+    def getCaller(self):
+        return self._caller
+
 class King(Piece):
 
-    def __init__(self, pieceChar):
+    def __init__(self, pieceChar, caller):
         super().__init__(pieceChar = pieceChar,
                             moveLimit = 1,
                             moveDirections = ['N','NE','E','SE',
-                                            'S','SW','W','NW'])
+                                            'S','SW','W','NW'],
+                            caller = caller)
 
 class WhiteKing(King):
-    def __init__(self):
-        super().__init__(pieceChar = 'K')
+    def __init__(self, caller = '?'):
+        super().__init__(pieceChar = 'K', caller = caller)
 
 class BlackKing(King):
-    def __init__(self):
-        super().__init__(pieceChar = 'k')
+    def __init__(self, caller = '?'):
+        super().__init__(pieceChar = 'k', caller = caller)
 
 class Board():
     _directions = ['N','NNE','NE','ENE','E','ESE','SE','SSE',
@@ -66,9 +71,17 @@ class Board():
                     'a2','b2','c2','d2','e2','f2','g2','h2',
                     'a1','b1','c1','d1','e1','f1','g1','h1']
 
-    def __init__(self, fenBoard, fenToPlay, fenCastling,
-                    fenEP, halfMove, move):
-        pass
+    def __init__(self, fenBoard = 'rnbqkbnr\pppppppp\8\8\8\8\PPPPPPPP\RNBQKBNR', fenToPlay = 'w', fenCastling = 'KQkq',
+                    fenEP = '-', halfMove = 0, move = 1):
+        self.fenBoard = fenBoard
+        self.K = self.newWhiteKing(caller = self)
+
+    def newWhiteKing(self, caller):
+        return WhiteKing(caller = caller)
+
+    def getBoard(self):
+        return self.fenBoard
+
 
 class Fen():
 
@@ -847,9 +860,20 @@ test = WhiteKing()
 print(test.getPieceChar())
 print(test.getMoveLimit())
 print(test.getMoveDirections())
+print(test.getCaller())
 
 print('starting direct tests: Black King\n')
 test = BlackKing()
 print(test.getPieceChar())
 print(test.getMoveLimit())
 print(test.getMoveDirections())
+print(test.getCaller())
+
+print('called from board\n')
+test = Board()
+print(test.K.getPieceChar())
+print(test.K.getMoveLimit())
+print(test.K.getMoveDirections())
+print(test.K.getCaller())
+a = test.K.getCaller()
+print(a.getBoard())
